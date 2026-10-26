@@ -72,12 +72,12 @@
 
   /* Tarjeta SELECCIONADA (con el dedo encima) o ya respondida → borde rosa neón */
   .card { padding: 16px 16px 18px; transition: border-color .2s, box-shadow .2s, transform .15s; }
-  .card:focus-within, .card.done {
+  .card:focus-within {
     border-color: var(--pink);
     box-shadow: 0 0 6px rgba(255,63,164,.85), 0 0 20px rgba(255,63,164,.50), inset 0 0 14px rgba(255,63,164,.18);
+    transform: translateY(-2px);
   }
-  .card:focus-within { transform: translateY(-2px); }
-  .card:focus-within::before, .card:focus-within::after, .card.done::before, .card.done::after { border-color: var(--pink); }
+  .card:focus-within::before, .card:focus-within::after { border-color: var(--pink); }
   .card .tag { display: flex; justify-content: space-between; align-items: center; font-size: 8px; color: #a78bfa; margin-bottom: 10px; }
   .card .tag .ok { color: var(--green); opacity: 0; transform: scale(.4); transition: .25s; font-size: 11px; }
   .card.done .tag .ok { opacity: 1; transform: scale(1); }

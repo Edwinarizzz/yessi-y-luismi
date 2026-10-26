@@ -1,25 +1,29 @@
-# Yessi & Luismi · Predicciones del bebé
+# Yessi & Luismi · Baby Prediction Bingo
 
-Página estática, sin base de datos, sin dominio propio y sin build. Los invitados llenan sus predicciones y las
-envían por WhatsApp al número configurado. Publicada con GitHub Pages: https://edwinarizzz.github.io/yessi-y-luismi/
+Página estática (GitHub Pages) pensada para celular. Sin servidor propio ni dominio: las predicciones se guardan
+en una hoja de Google (Apps Script) y también se pueden enviar por WhatsApp.
+
+Publicada en: https://edwinarizzz.github.io/yessi-y-luismi/
 
 ## Archivos
-- `index.html` — el formulario que comparten los invitados (diseño sobrio: marfil, verde salvia y dorado).
-- `admin.html` — para la organizadora: pega los mensajes de WhatsApp, pone los resultados reales y calcula
-  ganadores (todo en el navegador, no sube nada).
+- `index.html` — el juego que comparten los invitados (estilo arcade neón; la tarjeta activa brilla en rosado).
+- `admin.html` — panel de la organizadora: carga las respuestas de la hoja, pone los resultados reales y muestra
+  el ranking. Pide una clave la primera vez.
+- `apps-script.gs` — script de Google Sheets. **No está en el repo** (`.gitignore`) porque lleva la clave.
 - `foto.jpg` (opcional) — activar con `CONFIG.foto = "foto.jpg"`.
 
 ## Configuración
 Bloque `CONFIG` al inicio del `<script>` de `index.html`: teléfono, mensaje, fecha probable (cuenta regresiva),
-fecha límite, foto y pregunta de sexo.
+fecha límite, foto, pregunta de sexo, música y URL de la hoja (`hoja`).
 
-## Funciones
-- 11 preguntas + mensaje opcional; «momento del día» es una selección (madrugada / mañana / tarde / noche).
-- Cuenta regresiva, foto opcional, barra de progreso discreta, borrador autoguardado.
-- Envío por WhatsApp o copiar el texto; QR del enlace (api.qrserver.com, solo cuando está publicada).
+## Puntos (admin.html)
+- 1 punto por acierto exacto en cada una de las 11 preguntas.
+- Fecha (±1 día), peso (±0.1 kg) y longitud (±1 cm): quedar cerca da 0.5 punto. Los márgenes están en `tol` dentro de `Q`.
+- El peso se lee como kilos; si alguien escribe libras quedará lejos.
 
 ## Estado
-- Rediseño elegante (se quitó el tema de videojuego, la música y la pantalla de inicio).
-- Scripts revisados por sintaxis con `node --check`; **sin probar en navegador** desde este entorno.
-- Si se cambian textos de opciones o etiquetas del mensaje en `index.html`, cambiarlos igual en `admin.html`
-  (array `Q`), porque la puntuación compara texto exacto.
+- Funciona: guardado en la hoja (probado con el endpoint real), lectura con clave, música que se pausa en segundo plano.
+- Scripts revisados por sintaxis con `node --check`; el diseño se probó en celular por el usuario.
+- Pendiente antes de compartir: borrar las filas de "PRUEBA" de la hoja de Google.
+- Si se cambian textos de opciones o etiquetas del mensaje en `index.html`, cambiarlos igual en `admin.html` (`Q`).
+- Si se cambia el script de Google: Implementar → Administrar implementaciones → Nueva versión.

@@ -492,6 +492,15 @@ function setMusic(on) {
 }
 $("btn-music").onclick = () => setMusic(!musicOn);
 
+// Pausar al salir de la página o cambiar de app; reanudar al volver si estaba activada
+function pauseMusic() { clearInterval(musicTimer); if (ac) ac.suspend(); }
+document.addEventListener("visibilitychange", () => {
+  if (!musicOn) return;
+  if (document.hidden) pauseMusic();
+  else { ac.resume(); clearInterval(musicTimer); musicTimer = setInterval(beep, 240); }
+});
+window.addEventListener("pagehide", pauseMusic);
+
 // ---- Pantalla de inicio ----
 $("btn-start").onclick = () => {
   $("start").classList.add("hide");

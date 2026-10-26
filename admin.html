@@ -105,7 +105,7 @@
   <section class="box">
     <h2 class="step px">1 · RESULTADOS REALES</h2>
     <div class="fields" id="real"></div>
-    <p class="hint">Se guardan en este teléfono. Deja vacío lo que quieras ignorar. Tolerancia: peso ±0.1 kg · longitud ±1 cm. Fecha y momento del día, exactos.</p>
+    <p class="hint">Se guardan en este teléfono. Deja vacío lo que quieras ignorar. Peso, longitud y fecha: el punto es para quien más se acerque (si hay empate, todos lo reciben). El resto, respuesta exacta.</p>
     <button type="button" class="link" id="clear-real">Borrar resultados</button>
   </section>
 
@@ -184,6 +184,15 @@ function hit(q, real, guess) {
   }
 }
 
+// Valor numérico para medir cercanía: kilos/cm, o días para la fecha (dd/mm/aaaa)
+function dist(q, s) {
+  if (q.t === "date") {
+    const m = /(\d+)\/(\d+)\/(\d+)/.exec(s);
+    return m ? Date.UTC(+m[3], +m[2] - 1, +m[1]) / 864e5 : NaN;
+  }
+  return num(s);
+}
+
 function realValues() {
   return Q.map((q, i) => {
     let v = $("r" + i).value.trim();
@@ -207,8 +216,25 @@ function render() {
   const real = realValues();
   const given = real.filter(Boolean).length;
 
+  // Peso, longitud y fecha: el punto es para quien más se acerque (empates: todos lo reciben)
+  const closest = Q.map((q, i) => {
+    if ((q.t !== "num" && q.t !== "date") || !real[i]) return null;
+    const r = dist(q, real[i]);
+    if (isNaN(r)) return null;
+    const ds = LIST.map(p => Math.abs(dist(q, p.a[i]) - r)).filter(d => !isNaN(d));
+    return ds.length ? { r, min: Math.min(...ds) } : null;
+  });
+
   const rows = LIST.map(p => {
-    const res = Q.map((q, i) => hit(q, real[i], p.a[i]));
+    const res = Q.map((q, i) => {
+      if (q.t === "num" || q.t === "date") {
+        const c = closest[i];
+        if (!c) return false;
+        const d = Math.abs(dist(q, p.a[i]) - c.r);
+        return !isNaN(d) && d === c.min;
+      }
+      return hit(q, real[i], p.a[i]);
+    });
     return { ...p, res, pts: res.filter(Boolean).length };
   }).sort((a, b) => b.pts - a.pts);
 

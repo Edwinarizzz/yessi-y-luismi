@@ -2,7 +2,8 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#faf7f2">
 <title>Yessi y Luismi · Predicciones del bebé</title>
 <meta property="og:title" content="Yessi y Luismi · Predicciones del bebé">
 <meta property="og:description" content="¿Cómo será nuestro bebé? Haz tu predicción.">
@@ -13,13 +14,15 @@
     --line: #e7dfd1; --sage: #7d9181; --sage-dark: #5c7263; --gold: #b39a62; --blush: #d8b4b0;
   }
   * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-padding-bottom: 130px; }
   body {
-    margin: 0; padding: 28px 16px 40px; min-height: 100vh;
+    -webkit-tap-highlight-color: transparent;
+    margin: 0; padding: 20px 16px calc(150px + env(safe-area-inset-bottom)); min-height: 100vh; min-height: 100dvh;
     font-family: 'Jost', system-ui, sans-serif; font-weight: 400; color: var(--ink);
     background: var(--bg);
     background-image: radial-gradient(circle at 50% -10%, #f1ece1 0%, transparent 55%);
   }
-  .wrap { max-width: 720px; margin: 0 auto; }
+  .wrap { max-width: 520px; margin: 0 auto; }
   .serif { font-family: 'Cormorant Garamond', Georgia, serif; }
 
   header { text-align: center; padding: 24px 8px 8px; }
@@ -41,9 +44,7 @@
   .name-panel { margin: 26px 0 16px; }
   label.lbl, .field-title { display: block; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
 
-  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
-  @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
-  .grid .wide { grid-column: 1 / -1; }
+  .grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
 
   .card { position: relative; transition: border-color .25s; }
   .card.done { border-color: var(--sage); }
@@ -52,7 +53,7 @@
   .card h3 { margin: 2px 0 14px; font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 600; font-size: 21px; line-height: 1.2; }
 
   input, select, textarea {
-    width: 100%; padding: 12px 13px; border-radius: 9px; font: inherit; font-size: 15px;
+    width: 100%; min-height: 50px; padding: 12px 14px; border-radius: 10px; font: inherit; font-size: 16px; /* 16px evita el zoom automático en iPhone */
     background: #fdfcf9; border: 1px solid var(--line); color: var(--ink); transition: .2s;
   }
   select { appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
@@ -61,13 +62,19 @@
   input:focus, select:focus, textarea:focus { outline: none; border-color: var(--sage); box-shadow: 0 0 0 3px rgba(125,145,129,.18); }
   ::placeholder { color: #b5afa3; }
 
-  .progress { margin: 26px 0 6px; text-align: center; }
+  .sendbar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 5;
+    padding: 10px 16px calc(12px + env(safe-area-inset-bottom));
+    background: rgba(250,247,242,.96); backdrop-filter: blur(8px); border-top: 1px solid var(--line);
+  }
+  .sendbar-in { max-width: 520px; margin: 0 auto; text-align: center; }
   .bar { height: 3px; background: var(--line); border-radius: 3px; overflow: hidden; }
   .bar > i { display: block; height: 100%; width: 0; background: var(--sage); transition: width .35s; }
-  .progress small { display: block; margin-top: 10px; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+  .sendbar small { display: block; margin: 6px 0 8px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  .sendbar .btn { max-width: none; }
+  .sendbar .link { margin-top: 6px; padding: 6px 10px; }
 
-  .actions { display: flex; flex-direction: column; gap: 12px; align-items: center; margin: 22px 0 6px; }
-  .btn { width: 100%; max-width: 380px; padding: 15px 22px; border: 0; border-radius: 999px; font: inherit; font-weight: 500; font-size: 14px; letter-spacing: .12em; text-transform: uppercase; cursor: pointer; background: var(--sage-dark); color: #fff; transition: background .2s, transform .1s; }
+  .btn { width: 100%; max-width: 380px; min-height: 52px; padding: 15px 22px; border: 0; border-radius: 999px; font: inherit; font-weight: 500; font-size: 14px; letter-spacing: .12em; text-transform: uppercase; cursor: pointer; background: var(--sage-dark); color: #fff; transition: background .2s, transform .1s; }
   .btn:hover { background: #4d6254; }
   .btn:active { transform: scale(.985); }
   .btn.ghost { background: transparent; color: var(--sage-dark); border: 1px solid var(--sage); }
@@ -84,7 +91,7 @@
   .share p { margin: 10px 0 0; font-size: 13px; color: var(--muted); }
   footer { text-align: center; margin-top: 30px; font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 18px; color: var(--blush); }
 
-  .toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 80px); opacity: 0; background: var(--ink); color: #fff;
+  .toast { position: fixed; left: 50%; bottom: calc(160px + env(safe-area-inset-bottom)); transform: translate(-50%, 80px); opacity: 0; background: var(--ink); color: #fff;
     padding: 12px 20px; border-radius: 999px; font-size: 14px; transition: .3s; z-index: 10; max-width: 90vw; text-align: center; }
   .toast.show { transform: translate(-50%, 0); opacity: 1; }
 </style>
@@ -105,7 +112,7 @@
   <form id="form" autocomplete="off" novalidate>
     <div class="panel name-panel">
       <label class="lbl" for="player">Tu nombre</label>
-      <input type="text" id="player" placeholder="¿Quién predice?" maxlength="40">
+      <input type="text" id="player" placeholder="¿Quién predice?" maxlength="40" autocapitalize="words" autocomplete="name" enterkeyhint="next">
     </div>
 
     <div class="grid">
@@ -124,7 +131,7 @@
 
       <div class="panel card" data-card>
         <div class="num">03</div><h3>Peso al nacer</h3>
-        <input type="text" id="weight" placeholder="Ej: 3.2 kg" maxlength="20">
+        <input type="text" id="weight" placeholder="Ej: 3.2 kg" maxlength="20" inputmode="decimal" enterkeyhint="next">
       </div>
 
       <div class="panel card" data-card>
@@ -137,7 +144,7 @@
 
       <div class="panel card" data-card>
         <div class="num">05</div><h3>Longitud</h3>
-        <input type="text" id="length" placeholder="Ej: 50 cm" maxlength="20">
+        <input type="text" id="length" placeholder="Ej: 50 cm" maxlength="20" inputmode="decimal" enterkeyhint="next">
       </div>
 
       <div class="panel card" data-card>
@@ -185,7 +192,7 @@
 
       <div class="panel card wide" data-card>
         <div class="num">11</div><h3>¿Qué nombre le pondrán?</h3>
-        <input type="text" id="babyname" placeholder="Tu mejor apuesta" maxlength="30">
+        <input type="text" id="babyname" placeholder="Tu mejor apuesta" maxlength="30" autocapitalize="words" enterkeyhint="done">
       </div>
 
       <div class="panel card wide" data-card>
@@ -194,15 +201,6 @@
       </div>
     </div>
 
-    <div class="progress">
-      <div class="bar"><i id="bar"></i></div>
-      <small id="progress-text"></small>
-    </div>
-
-    <div class="actions">
-      <button type="button" class="btn" id="btn-send">Enviar por WhatsApp</button>
-      <button type="button" class="link" id="btn-copy">o copiar mi predicción</button>
-    </div>
   </form>
 
   <section class="panel thanks" id="thanks">
@@ -213,12 +211,21 @@
   </section>
 
   <section class="share" id="share">
-    <div class="field-title">Comparte esta invitación</div>
+    <button type="button" class="btn ghost" id="btn-share" style="margin:0 auto" hidden>Compartir con alguien</button>
     <img id="qr" alt="Código QR" hidden>
-    <p>Escanea el código o comparte el enlace.</p>
+    <p id="qr-note" hidden>Escanea el código o comparte el enlace.</p>
   </section>
 
   <footer>Con cariño, Yessi &amp; Luismi</footer>
+</div>
+
+<div class="sendbar">
+  <div class="sendbar-in">
+    <div class="bar"><i id="bar"></i></div>
+    <small id="progress-text"></small>
+    <button type="button" class="btn" id="btn-send">Enviar por WhatsApp</button>
+    <button type="button" class="link" id="btn-copy">o copiar mi predicción</button>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -360,8 +367,15 @@ if (CONFIG.fechaProbable) {
 
 // ---- QR del enlace (imagen generada por api.qrserver.com) ----
 if (location.protocol.startsWith("http")) {
-  $("qr").src = "https://api.qrserver.com/v1/create-qr-code/?size=320x320&data=" + encodeURIComponent(location.href.split("#")[0]);
-  $("qr").hidden = false;
+  const url = location.href.split("#")[0];
+  if (navigator.share) {
+    // En el celular: menú nativo de compartir (WhatsApp, etc.)
+    $("btn-share").hidden = false;
+    $("btn-share").onclick = () => navigator.share({ title: document.title, text: "¡Haz tu predicción del bebé de Yessi y Luismi!", url }).catch(() => {});
+  } else {
+    $("qr").src = "https://api.qrserver.com/v1/create-qr-code/?size=320x320&data=" + encodeURIComponent(url);
+    $("qr").hidden = false; $("qr-note").hidden = false;
+  }
 } else {
   $("share").hidden = true; // en local (file://) no hay enlace que compartir
 }

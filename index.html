@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Baby Prediction Bingo</title>
+<meta property="og:title" content="🎮 Baby Prediction Bingo">
+<meta property="og:description" content="¡Haz tu predicción del bebé y participa!">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0a1d; --card: rgba(22,16,48,.8);
+    --purple: #8b5cf6; --cyan: #38bdf8; --pink: #f472b6; --green: #22c55e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; padding: 16px;
+    font-family: 'Inter', system-ui, sans-serif; color: #f3f4f6;
+    background:
+      radial-gradient(circle at 15% 15%, rgba(147,51,234,.18), transparent 40%),
+      radial-gradient(circle at 85% 85%, rgba(6,182,212,.18), transparent 40%),
+      linear-gradient(180deg, #090514, #120b29);
+    background-attachment: fixed;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; }
+  .px { font-family: 'Press Start 2P', monospace; }
+
+  header { text-align: center; padding: 20px 14px; margin-bottom: 18px; }
+  header h1 { margin: 0 0 10px; font-size: clamp(14px, 4.2vw, 26px); color: var(--pink); text-shadow: 0 0 10px rgba(244,114,182,.6); line-height: 1.4; }
+  header .sub { font-size: clamp(9px, 2.4vw, 12px); color: var(--cyan); }
+  header .intro { margin: 14px 0 0; font-size: 14px; color: #c4b5fd; }
+
+  .box {
+    background: var(--card); border: 2px solid var(--purple); border-radius: 14px;
+    box-shadow: 0 0 15px rgba(139,92,246,.3), inset 0 0 15px rgba(139,92,246,.12);
+    backdrop-filter: blur(10px);
+  }
+  .box.cyan { border-color: #06b6d4; box-shadow: 0 0 15px rgba(6,182,212,.3), inset 0 0 15px rgba(6,182,212,.12); }
+
+  .name-box { padding: 16px; margin-bottom: 16px; }
+  label.lbl { display: block; font-size: 10px; color: #7dd3fc; margin-bottom: 10px; }
+
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+
+  .card { padding: 14px; display: flex; flex-direction: column; gap: 10px; transition: transform .15s, border-color .2s; }
+  .card.done { border-color: var(--green); box-shadow: 0 0 14px rgba(34,197,94,.35); }
+  .card .tag { font-size: 8px; color: #a78bfa; display: flex; justify-content: space-between; }
+  .card .tag .ok { opacity: 0; color: var(--green); transition: opacity .2s; }
+  .card.done .tag .ok { opacity: 1; }
+  .card h3 { margin: 0; font-size: 15px; display: flex; gap: 8px; align-items: center; }
+
+  input, select, textarea {
+    width: 100%; padding: 11px 12px; border-radius: 9px; font: inherit; font-size: 15px;
+    background: rgba(15,11,36,.92); border: 1px solid #6d28d9; color: #fff; transition: .2s;
+  }
+  textarea { resize: vertical; min-height: 64px; }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--cyan); box-shadow: 0 0 10px rgba(56,189,248,.5); }
+  ::placeholder { color: #8b83b0; }
+  input[type="date"], input[type="time"] { color-scheme: dark; }
+
+  .progress { margin: 18px 0 6px; }
+  .bar { height: 12px; border-radius: 8px; background: rgba(255,255,255,.08); overflow: hidden; border: 1px solid #4c1d95; }
+  .bar > i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--purple), var(--cyan), var(--green)); transition: width .3s; }
+  .progress small { display: block; text-align: center; margin-top: 8px; font-size: 8px; color: #c4b5fd; line-height: 1.6; }
+
+  .actions { display: flex; flex-direction: column; gap: 14px; align-items: center; margin: 22px 0 10px; }
+  .btn {
+    font-family: 'Press Start 2P', monospace; font-size: 11px; text-transform: uppercase; color: #fff;
+    border: 0; border-radius: 10px; padding: 18px 26px; cursor: pointer; width: 100%; max-width: 420px;
+    transition: transform .1s, box-shadow .1s; line-height: 1.5;
+  }
+  .btn.green { background: linear-gradient(180deg, #22c55e, #15803d); box-shadow: 0 5px 0 #14532d, 0 8px 15px rgba(0,0,0,.4); }
+  .btn.purple { background: linear-gradient(180deg, #a855f7, #7e22ce); box-shadow: 0 5px 0 #581c87, 0 8px 15px rgba(0,0,0,.4); }
+  .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 rgba(0,0,0,.5); }
+  .link { background: none; border: 0; color: #a5b4fc; font: inherit; font-size: 13px; text-decoration: underline; cursor: pointer; }
+
+  .thanks { display: none; text-align: center; padding: 28px 18px; margin-top: 8px; }
+  .thanks.show { display: block; }
+  .thanks h2 { font-size: 14px; color: #fde047; text-shadow: 0 0 8px rgba(253,224,71,.6); line-height: 1.6; }
+  .thanks p { color: #d1d5db; font-size: 14px; }
+
+  footer { text-align: center; font-size: 11px; color: #a78bfa; margin: 28px 0 8px; }
+
+  .start {
+    position: fixed; inset: 0; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 22px; padding: 24px; text-align: center; background: #090514;
+    background-image: radial-gradient(circle at 50% 40%, rgba(147,51,234,.35), transparent 60%);
+  }
+  .start.hide { display: none; }
+  .start h1 { font-size: clamp(16px, 5vw, 30px); color: var(--pink); text-shadow: 0 0 12px rgba(244,114,182,.7); line-height: 1.5; margin: 0; }
+  .start .blink { animation: blink 1s steps(2) infinite; font-size: 12px; color: #fde047; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .photo { width: 150px; height: 150px; object-fit: cover; border-radius: 50%; border: 3px solid var(--cyan); box-shadow: 0 0 20px rgba(56,189,248,.5); }
+  header .photo { width: 110px; height: 110px; margin-bottom: 10px; }
+
+  .countdown { display: flex; justify-content: center; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+  .countdown div { min-width: 62px; padding: 8px 6px; border-radius: 8px; border: 1px solid #4c1d95; background: rgba(15,11,36,.8); }
+  .countdown b { display: block; font-family: 'Press Start 2P', monospace; font-size: 15px; color: #fde047; }
+  .countdown span { font-size: 10px; color: #a78bfa; text-transform: uppercase; }
+  .deadline { margin-top: 10px; font-size: 12px; color: #fca5a5; }
+  .grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 14px; }
+  @media (max-width: 720px) { .grid2 { grid-template-columns: 1fr; } }
+
+  .music { position: fixed; top: 12px; right: 12px; z-index: 15; width: 44px; height: 44px; border-radius: 50%;
+    border: 2px solid var(--purple); background: rgba(22,16,48,.9); font-size: 20px; cursor: pointer; }
+  .share { text-align: center; padding: 18px; margin-top: 26px; }
+  .share img { background: #fff; padding: 8px; border-radius: 10px; width: 160px; height: 160px; }
+  .share p { margin: 10px 0 0; font-size: 13px; color: #c4b5fd; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 80px); opacity: 0;
+    background: #1e1b4b; border: 2px solid var(--cyan); color: #fff; padding: 12px 18px; border-radius: 10px;
+    font-size: 14px; transition: .3s; z-index: 10; max-width: 90vw; text-align: center;
+  }
+  .toast.show { transform: translate(-50%, 0); opacity: 1; }
+</style>
+</head>
+<body>
+<div class="start" id="start">
+  <img class="photo" id="photo-start" alt="" hidden>
+  <h1 class="px">BABY PREDICTION<br>BINGO</h1>
+  <div class="sub px" style="color:#38bdf8;font-size:11px">(GAMING EDITION)</div>
+  <button type="button" class="btn green" id="btn-start">▶ PRESS START</button>
+  <div class="blink px">INSERT PREDICTION</div>
+</div>
+<button type="button" class="music" id="btn-music" title="Música" hidden>🔇</button>
+
+<div class="wrap">
+
+  <header class="box">
+    <img class="photo" id="photo-head" alt="" hidden>
+    <h1 class="px">BABY PREDICTION BINGO</h1>
+    <div class="sub px">(GAMING EDITION)</div>
+    <p class="intro" id="intro"></p>
+    <div class="countdown" id="countdown" hidden></div>
+    <div class="deadline" id="deadline" hidden></div>
+  </header>
+
+  <form id="form" autocomplete="off" novalidate>
+    <div class="box cyan name-box">
+      <label class="lbl px" for="player">👾 TU NOMBRE / PLAYER 1</label>
+      <input type="text" id="player" placeholder="Escribe tu nombre aquí..." maxlength="40">
+    </div>
+
+    <div class="grid">
+      <div class="box card" data-card>
+        <div class="tag px"><span>CARD 1</span><span class="ok">✔</span></div>
+        <h3>👨‍👩‍👦 ¿A quién se parece más?</h3>
+        <select id="resemble">
+          <option value="">Selecciona una opción...</option>
+          <option>Mamá 👩</option><option>Papá 👨</option><option>Mezcla 50/50 🔀</option>
+        </select>
+      </div>
+
+      <div class="box card" data-card>
+        <div class="tag px"><span>CARD 2</span><span class="ok">✔</span></div>
+        <h3>📅 Fecha de nacimiento</h3>
+        <input type="date" id="birthdate">
+      </div>
+
+      <div class="box card" data-card>
+        <div class="tag px"><span>CARD 3</span><span class="ok">✔</span></div>
+        <h3>⚖️ Peso al nacer</h3>
+        <input type="text" id="weight" placeholder="Ej: 3.2 kg" maxlength="20">
+      </div>
+
+      <div class="box card" data-card>
+        <div class="tag px"><span>CARD 4</span><span class="ok">✔</span></div>
+        <h3>👁️ Color de ojos</h3>
+        <select id="eyes">
+          <option value="">Selecciona opción...</option>
+          <option>Marrón / Oscuros 🤎</option><option>Azul 💙</option><option>Verde 💚</option><option>Miel / Cambiantes 👁️</option>
+        </select>
+      </div>
+
+      <div class="box card" data-card>
+        <div class="tag px"><span>CARD 5</span><span class="ok">✔</span></div>
+        <h3>📏 Longitud</h3>
+        <input type="text" id="length" placeholder="Ej: 50 cm" maxlength="20">
+      </div>
+
+      <div class="box card" data-card>
+        <div class="tag px"><span>CARD 6</span><span class="ok">✔</span></div>
+        <h3>☀️🌙 Hora de llegada</h3>
+        <input type="time" id="time">
+      </div>
+
+      <div class="box card" data-card>
+        <div class="tag px"><span>CARD 7</span><span class="ok">✔</span></div>
+        <h3>💇 ¿Tendrá mucho pelo?</h3>
+        <select id="hair">
+          <option value="">Selecciona opción...</option>
+          <option>¡Mucho pelo! 🦁</option><option>Poco pelo / Normal 👶</option><option>Calvito 👨‍🦲</option>
+        </select>
+      </div>
+
+      <div class="box card" data-card>
+        <div class="tag px"><span>CARD 8</span><span class="ok">✔</span></div>
+        <h3>👍 ¿Quién lo carga primero?</h3>
+        <select id="hands">
+          <option value="">Selecciona opción...</option>
+          <option>Mamá 👩</option><option>Papá 👨</option>
+        </select>
+      </div>
+
+      <div class="box card" data-card>
+        <div class="tag px"><span>CARD 9</span><span class="ok">✔</span></div>
+        <h3>🔊 ¿Llorará al nacer?</h3>
+        <select id="cry">
+          <option value="">Selecciona opción...</option>
+          <option>¡Sí, a todo pulmón! 😭</option><option>Un poco, tranquilito 🤫</option><option>No, súper relajado 😎</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="box card" data-card id="card-sex">
+        <div class="tag px"><span>CARD 10</span><span class="ok">✔</span></div>
+        <h3>🍼 ¿Niño o niña?</h3>
+        <select id="sex">
+          <option value="">Selecciona opción...</option>
+          <option>Niño 💙</option><option>Niña 💗</option>
+        </select>
+      </div>
+
+      <div class="box card" data-card>
+        <div class="tag px"><span>CARD 11</span><span class="ok">✔</span></div>
+        <h3>✍️ ¿Qué nombre le pondrán?</h3>
+        <input type="text" id="babyname" placeholder="Tu mejor apuesta..." maxlength="30">
+      </div>
+    </div>
+
+    <div class="box card" style="margin-top:14px" data-card>
+      <div class="tag px"><span>BONUS</span><span class="ok">✔</span></div>
+      <h3>💌 Mensaje para el bebé (opcional)</h3>
+      <textarea id="message" placeholder="Un deseo, un consejo, un chiste..." maxlength="200"></textarea>
+    </div>
+
+    <div class="progress">
+      <div class="bar"><i id="bar"></i></div>
+      <small class="px" id="progress-text">0 COMPLETADAS</small>
+    </div>
+
+    <div class="actions">
+      <button type="button" class="btn green" id="btn-send">📲 Enviar por WhatsApp</button>
+      <button type="button" class="link" id="btn-copy">o copiar mi predicción</button>
+    </div>
+  </form>
+
+  <section class="box thanks" id="thanks">
+    <h2 class="px">🎉 ¡PREDICCIÓN LISTA!</h2>
+    <p>Si WhatsApp se abrió, solo pulsa <b>Enviar</b> en el chat para que tu predicción llegue.<br>
+       Si no se abrió, usa «copiar mi predicción» y pégala por mensaje.</p>
+    <button type="button" class="btn purple" id="btn-again">Hacer otra predicción</button>
+  </section>
+
+  <section class="box share">
+    <div class="px" style="font-size:10px;color:#7dd3fc;margin-bottom:12px">📱 COMPARTE EL JUEGO</div>
+    <img id="qr" alt="Código QR del juego" hidden>
+    <p>Escanea el código o comparte este enlace.</p>
+  </section>
+
+  <footer>🎮 Baby Prediction Bingo • Gaming Edition 🎮</footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============ CONFIGURACIÓN: edita solo esto ============
+const CONFIG = {
+  // Número que RECIBE las predicciones. Con código de país, solo dígitos, sin "+" ni espacios.
+  // Ej. Venezuela: 584121234567
+  telefono: "584120000000",
+  titulo: "¡Adivina cómo será el bebé de Yessi!",
+  mensaje: "Llena tus predicciones y envíalas por WhatsApp. ¡Gana quien acierte más!",
+  fechaProbable: "2026-12-01",  // "AAAA-MM-DD" para la cuenta regresiva; "" para ocultarla
+  fechaLimite: "",              // "AAAA-MM-DD": último día para participar; "" = sin límite
+  foto: "",                     // ej. "foto.jpg" (súbela al repo junto a index.html); "" = sin foto
+  preguntarSexo: true,          // false si ya se sabe y no quieres la pregunta
+  musica: true,                 // música retro (se activa al pulsar START)
+};
+// ========================================================
+
+const $ = id => document.getElementById(id);
+let FIELDS = ["player","resemble","birthdate","weight","eyes","length","time","hair","hands","cry","sex","babyname","message"];
+if (!CONFIG.preguntarSexo) { $("card-sex").remove(); FIELDS = FIELDS.filter(f => f !== "sex"); }
+const DRAFT_KEY = "baby_bingo_draft";
+
+$("intro").textContent = CONFIG.mensaje;
+document.querySelector("header h1").insertAdjacentHTML("afterend", `<div style="font-size:14px;margin-bottom:6px">${CONFIG.titulo}</div>`);
+
+function toast(msg) {
+  const t = $("toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove("show"), 2800);
+}
+
+function formatDate(v) {
+  if (!v) return "";
+  const [y, m, d] = v.split("-");
+  return `${d}/${m}/${y}`;
+}
+
+function read() { return Object.fromEntries(FIELDS.map(f => [f, $(f).value.trim()])); }
+
+function updateProgress() {
+  const keys = FIELDS.filter(f => f !== "player" && f !== "message");
+  let done = 0;
+  keys.forEach(k => {
+    const ok = !!$(k).value.trim();
+    $(k).closest("[data-card]").classList.toggle("done", ok);
+    if (ok) done++;
+  });
+  $("message").closest("[data-card]").classList.toggle("done", !!$("message").value.trim());
+  $("bar").style.width = (done / keys.length * 100) + "%";
+  $("progress-text").textContent = done === keys.length ? "¡NIVEL COMPLETADO! 🏆" : `${done} / ${keys.length} COMPLETADAS`;
+}
+
+function saveDraft() {
+  try { localStorage.setItem(DRAFT_KEY, JSON.stringify(read())); } catch (e) {}
+}
+function loadDraft() {
+  try {
+    const d = JSON.parse(localStorage.getItem(DRAFT_KEY) || "{}");
+    FIELDS.forEach(f => { if (d[f]) $(f).value = d[f]; });
+  } catch (e) {}
+}
+
+function buildText(d) {
+  const v = (x, fb) => x || fb;
+  return [
+    `🎮 *BABY PREDICTION BINGO* 🎮`,
+    `👤 *Jugador:* ${d.player}`,
+    ``,
+    `1️⃣ *Parecido:* ${v(d.resemble, "—")}`,
+    `2️⃣ *Fecha:* ${v(formatDate(d.birthdate), "—")}`,
+    `3️⃣ *Peso:* ${v(d.weight, "—")}`,
+    `4️⃣ *Ojos:* ${v(d.eyes, "—")}`,
+    `5️⃣ *Longitud:* ${v(d.length, "—")}`,
+    `6️⃣ *Hora:* ${v(d.time, "—")}`,
+    `7️⃣ *Pelo:* ${v(d.hair, "—")}`,
+    `8️⃣ *Primeras manos:* ${v(d.hands, "—")}`,
+    `9️⃣ *¿Llorará?:* ${v(d.cry, "—")}`,
+    CONFIG.preguntarSexo ? `🔟 *Sexo:* ${v(d.sex, "—")}` : ``,
+    `1️⃣1️⃣ *Nombre:* ${v(d.babyname, "—")}`,
+    d.message ? `\n💌 ${d.message}` : ``,
+  ].join("\n").trim();
+}
+
+const limite = CONFIG.fechaLimite ? new Date(CONFIG.fechaLimite + "T23:59:59") : null;
+
+function validate() {
+  if (limite && new Date() > limite) { toast("⏰ El plazo para participar ya terminó"); return null; }
+  const d = read();
+  if (!d.player) {
+    toast("👾 Escribe tu nombre primero");
+    $("player").focus(); $("player").scrollIntoView({ behavior: "smooth", block: "center" });
+    return null;
+  }
+  return d;
+}
+
+$("btn-send").onclick = () => {
+  const d = validate(); if (!d) return;
+  const url = `https://wa.me/${CONFIG.telefono}?text=${encodeURIComponent(buildText(d))}`;
+  window.open(url, "_blank");
+  $("thanks").classList.add("show");
+  $("thanks").scrollIntoView({ behavior: "smooth", block: "center" });
+};
+
+$("btn-copy").onclick = async () => {
+  const d = validate(); if (!d) return;
+  try { await navigator.clipboard.writeText(buildText(d)); toast("📋 ¡Copiado! Pégalo en un mensaje"); }
+  catch (e) { prompt("Copia tu predicción:", buildText(d)); }
+};
+
+$("btn-again").onclick = () => {
+  FIELDS.forEach(f => $(f).value = "");
+  try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
+  $("thanks").classList.remove("show");
+  updateProgress();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
+
+$("form").addEventListener("input", () => { updateProgress(); saveDraft(); });
+loadDraft(); updateProgress();
+
+// ---- Foto ----
+if (CONFIG.foto) ["photo-start", "photo-head"].forEach(id => { $(id).src = CONFIG.foto; $(id).hidden = false; });
+
+// ---- Fecha límite ----
+if (limite) {
+  const dl = $("deadline"); dl.hidden = false;
+  dl.textContent = new Date() > limite ? "⏰ El plazo para participar terminó" : "⏰ Participa hasta el " + formatDate(CONFIG.fechaLimite);
+}
+
+// ---- Cuenta regresiva ----
+if (CONFIG.fechaProbable) {
+  const target = new Date(CONFIG.fechaProbable + "T00:00:00"), box = $("countdown");
+  const tick = () => {
+    const ms = target - new Date();
+    if (ms <= 0) { box.innerHTML = '<div style="min-width:0;padding:8px 16px"><b>¡YA CASI!</b></div>'; return; }
+    const d = Math.floor(ms / 864e5), h = Math.floor(ms / 36e5) % 24, m = Math.floor(ms / 6e4) % 60, s = Math.floor(ms / 1e3) % 60;
+    box.innerHTML = [[d, "días"], [h, "horas"], [m, "min"], [s, "seg"]].map(([n, l]) => `<div><b>${n}</b><span>${l}</span></div>`).join("");
+  };
+  box.hidden = false; tick(); setInterval(tick, 1000);
+}
+
+// ---- QR del enlace (imagen generada por api.qrserver.com) ----
+if (location.protocol.startsWith("http")) {
+  $("qr").src = "https://api.qrserver.com/v1/create-qr-code/?size=320x320&data=" + encodeURIComponent(location.href.split("#")[0]);
+  $("qr").hidden = false;
+} else {
+  $("qr").closest(".share").hidden = true; // en local (file://) no hay enlace que compartir
+}
+
+// ---- Música chiptune (WebAudio, sin archivos) ----
+let ac, musicTimer, musicOn = false, step = 0;
+const NOTES = [262, 330, 392, 523, 392, 330, 294, 349, 440, 587, 440, 349, 247, 330, 392, 494];
+function beep() {
+  const o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime;
+  o.type = "square"; o.frequency.value = NOTES[step++ % NOTES.length];
+  g.gain.setValueAtTime(.04, t); g.gain.exponentialRampToValueAtTime(.001, t + .22);
+  o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t + .24);
+}
+function setMusic(on) {
+  musicOn = on; $("btn-music").textContent = on ? "🔊" : "🔇";
+  if (on) { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume(); musicTimer = setInterval(beep, 240); }
+  else clearInterval(musicTimer);
+}
+$("btn-music").onclick = () => setMusic(!musicOn);
+
+// ---- Pantalla de inicio ----
+$("btn-start").onclick = () => {
+  $("start").classList.add("hide");
+  if (CONFIG.musica) { $("btn-music").hidden = false; setMusic(true); }
+};
+</script>
+</body>
+</html>

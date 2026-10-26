@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Bingo - Ganadores</title>
+<style>
+  body { margin: 0; padding: 16px; font-family: system-ui, sans-serif; background: #0d0a1d; color: #f3f4f6; }
+  .wrap { max-width: 900px; margin: 0 auto; }
+  h1 { font-size: 22px; color: #f472b6; }
+  h2 { font-size: 16px; color: #38bdf8; margin: 22px 0 8px; }
+  .box { background: #161030; border: 1px solid #6d28d9; border-radius: 12px; padding: 14px; }
+  .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+  label { font-size: 12px; color: #a78bfa; display: block; margin-bottom: 3px; }
+  input, select, textarea { width: 100%; padding: 9px; border-radius: 8px; border: 1px solid #6d28d9; background: #0f0b24; color: #fff; font: inherit; box-sizing: border-box; color-scheme: dark; }
+  textarea { min-height: 200px; }
+  button { margin-top: 12px; padding: 12px 22px; border: 0; border-radius: 10px; background: #22c55e; color: #fff; font-weight: 700; font-size: 15px; cursor: pointer; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
+  th, td { padding: 8px; border-bottom: 1px solid #2e1f6b; text-align: left; }
+  td.ok { color: #4ade80; } td.no { color: #6b7280; }
+  .winner td { background: rgba(253,224,71,.12); font-weight: 700; }
+  .note { font-size: 12px; color: #9ca3af; margin: 6px 0 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🏆 Calcular ganadores</h1>
+  <p class="note">Todo ocurre en tu navegador: nada se sube a ningún lado. Úsalo cuando el bebé ya haya nacido.</p>
+
+  <h2>1. Resultados reales</h2>
+  <div class="box row" id="real"></div>
+  <p class="note">Tolerancias para dar punto: peso ±0.1 kg · longitud ±1 cm · hora ±30 min. Fecha exacta. Nombre: coincide si contiene el mismo texto. Deja en blanco lo que no quieras puntuar.</p>
+
+  <h2>2. Pega aquí las predicciones recibidas por WhatsApp</h2>
+  <div class="box">
+    <textarea id="msgs" placeholder="Pega todos los mensajes juntos. Cada uno debe empezar con «BABY PREDICTION BINGO»."></textarea>
+    <button id="go">Calcular puntos</button>
+  </div>
+
+  <div id="out"></div>
+</div>
+
+<script>
+// key = etiqueta tal como aparece en el mensaje de WhatsApp; type = cómo se compara
+const Q = [
+  { k: "Parecido", t: "sel", o: ["Mamá 👩", "Papá 👨", "Mezcla 50/50 🔀"] },
+  { k: "Fecha", t: "date" },
+  { k: "Peso", t: "num", tol: 0.1, ph: "kg, ej. 3.2" },
+  { k: "Ojos", t: "sel", o: ["Marrón / Oscuros 🤎", "Azul 💙", "Verde 💚", "Miel / Cambiantes 👁️"] },
+  { k: "Longitud", t: "num", tol: 1, ph: "cm, ej. 50" },
+  { k: "Hora", t: "time" },
+  { k: "Pelo", t: "sel", o: ["¡Mucho pelo! 🦁", "Poco pelo / Normal 👶", "Calvito 👨‍🦲"] },
+  { k: "Primeras manos", t: "sel", o: ["Mamá 👩", "Papá 👨"] },
+  { k: "¿Llorará?", t: "sel", o: ["¡Sí, a todo pulmón! 😭", "Un poco, tranquilito 🤫", "No, súper relajado 😎"] },
+  { k: "Sexo", t: "sel", o: ["Niño 💙", "Niña 💗"] },
+  { k: "Nombre", t: "txt" },
+];
+const $ = id => document.getElementById(id);
+
+$("real").innerHTML = Q.map((q, i) => {
+  let f;
+  if (q.t === "sel") f = `<select id="r${i}"><option value="">—</option>${q.o.map(o => `<option>${o}</option>`).join("")}</select>`;
+  else if (q.t === "date") f = `<input id="r${i}" type="date">`;
+  else if (q.t === "time") f = `<input id="r${i}" type="time">`;
+  else f = `<input id="r${i}" type="text" placeholder="${q.ph || ""}">`;
+  return `<div><label>${q.k}</label>${f}</div>`;
+}).join("");
+
+const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").trim();
+const num = s => parseFloat(String(s).replace(",", ".").replace(/[^\d.]/g, ""));
+const mins = s => { const m = /(\d{1,2}):(\d{2})/.exec(s); return m ? +m[1] * 60 + +m[2] : NaN; };
+
+function hit(q, real, guess) {
+  if (!real || !guess || guess === "—") return false;
+  switch (q.t) {
+    case "sel": case "date": return real === guess;
+    case "num": { const a = num(real), b = num(guess); return !isNaN(a) && !isNaN(b) && Math.abs(a - b) <= q.tol + 1e-9; }
+    case "time": { const a = mins(real), b = mins(guess); return !isNaN(a) && !isNaN(b) && Math.abs(a - b) <= 30; }
+    default: return norm(guess).includes(norm(real)) || norm(real).includes(norm(guess));
+  }
+}
+
+function parse(block) {
+  const get = label => {
+    const m = new RegExp("\\*" + label.replace(/[?¿]/g, "\\$&") + ":\\*\\s*(.*)").exec(block);
+    return m ? m[1].trim() : "";
+  };
+  const p = /Jugador:\*\s*(.*)/.exec(block);
+  return { name: p ? p[1].trim() : "(sin nombre)", a: Q.map(q => get(q.k)) };
+}
+
+$("go").onclick = () => {
+  const real = Q.map((q, i) => {
+    let v = $("r" + i).value.trim();
+    if (q.t === "date" && v) { const [y, m, d] = v.split("-"); v = `${d}/${m}/${y}`; }
+    return v;
+  });
+  const blocks = $("msgs").value.split(/BABY PREDICTION BINGO/i).slice(1);
+  if (!blocks.length) { $("out").innerHTML = '<p class="note">No encontré predicciones. Pega los mensajes completos.</p>'; return; }
+
+  const rows = blocks.map(parse).map(p => {
+    const res = Q.map((q, i) => hit(q, real[i], p.a[i]));
+    return { ...p, res, pts: res.filter(Boolean).length };
+  }).sort((a, b) => b.pts - a.pts);
+
+  const top = rows[0].pts;
+  $("out").innerHTML = `<h2>3. Resultados</h2>
+  <div class="box" style="overflow-x:auto"><table>
+    <tr><th>#</th><th>Jugador</th><th>Pts</th>${Q.map(q => `<th>${q.k}</th>`).join("")}</tr>
+    ${rows.map((r, i) => `<tr class="${r.pts === top && top > 0 ? "winner" : ""}">
+      <td>${i + 1}</td><td>${r.name.replace(/</g, "&lt;")}</td><td><b>${r.pts}</b></td>
+      ${r.res.map(ok => `<td class="${ok ? "ok" : "no"}">${ok ? "✔" : "·"}</td>`).join("")}</tr>`).join("")}
+  </table></div>
+  <p class="note">${top > 0 ? "🏆 Gana: " + rows.filter(r => r.pts === top).map(r => r.name).join(", ") + " con " + top + " punto(s)." : "Nadie acertó todavía."}</p>`;
+};
+</script>
+</body>
+</html>

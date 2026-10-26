@@ -3,154 +3,232 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#faf7f2">
-<title>Yessi y Luismi · Predicciones del bebé</title>
-<meta property="og:title" content="Yessi y Luismi · Predicciones del bebé">
-<meta property="og:description" content="¿Cómo será nuestro bebé? Haz tu predicción.">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#0d0a1d">
+<title>Baby Prediction Bingo · Yessi y Luismi</title>
+<meta property="og:title" content="🎮 Baby Prediction Bingo · Yessi y Luismi">
+<meta property="og:description" content="¡Haz tu predicción del bebé y participa!">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #faf7f2; --paper: #ffffff; --ink: #3a3834; --muted: #8a857b;
-    --line: #e7dfd1; --sage: #7d9181; --sage-dark: #5c7263; --gold: #b39a62; --blush: #d8b4b0;
+    --bg: #0d0a1d; --panel: rgba(22,16,48,.82);
+    --purple: #8b5cf6; --purple-dark: #4c1d95; --cyan: #38bdf8; --yellow: #fde047;
+    --pink: #ff3fa4; --green: #22c55e;
   }
   * { box-sizing: border-box; }
-  html { -webkit-text-size-adjust: 100%; scroll-padding-bottom: 130px; }
+  html { -webkit-text-size-adjust: 100%; scroll-padding-bottom: 170px; }
   body {
     -webkit-tap-highlight-color: transparent;
-    margin: 0; padding: 20px 16px calc(150px + env(safe-area-inset-bottom)); min-height: 100vh; min-height: 100dvh;
-    font-family: 'Jost', system-ui, sans-serif; font-weight: 400; color: var(--ink);
-    background: var(--bg);
-    background-image: radial-gradient(circle at 50% -10%, #f1ece1 0%, transparent 55%);
+    margin: 0; padding: 18px 14px calc(170px + env(safe-area-inset-bottom)); min-height: 100vh; min-height: 100dvh;
+    font-family: 'Inter', system-ui, sans-serif; color: #f3f4f6; background-color: var(--bg);
+    background-image:
+      radial-gradient(circle at 15% 10%, rgba(147,51,234,.22), transparent 40%),
+      radial-gradient(circle at 85% 90%, rgba(6,182,212,.20), transparent 40%),
+      linear-gradient(180deg, #090514, #120b29);
+    background-attachment: fixed;
   }
-  .wrap { max-width: 520px; margin: 0 auto; }
-  .serif { font-family: 'Cormorant Garamond', Georgia, serif; }
+  /* estrellitas de fondo */
+  body::before {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: .55;
+    background-image:
+      radial-gradient(1.5px 1.5px at 20px 30px, #fff, transparent),
+      radial-gradient(1px 1px at 90px 120px, #c4b5fd, transparent),
+      radial-gradient(1.5px 1.5px at 160px 60px, #7dd3fc, transparent),
+      radial-gradient(1px 1px at 220px 170px, #fff, transparent);
+    background-size: 240px 200px; animation: twinkle 4s ease-in-out infinite alternate;
+  }
+  @keyframes twinkle { from { opacity: .25; } to { opacity: .65; } }
+  .wrap { position: relative; z-index: 1; max-width: 520px; margin: 0 auto; }
+  .px { font-family: 'Press Start 2P', monospace; }
 
-  header { text-align: center; padding: 24px 8px 8px; }
-  .eyebrow { letter-spacing: .32em; text-transform: uppercase; font-size: 11px; color: var(--gold); }
-  header h1 { margin: 12px 0 6px; font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 500; font-size: clamp(34px, 9vw, 54px); line-height: 1.1; }
-  header h1 em { color: var(--sage-dark); font-style: italic; }
-  .orn { display: flex; align-items: center; justify-content: center; gap: 12px; color: var(--gold); margin: 14px 0; }
-  .orn::before, .orn::after { content: ""; width: 64px; height: 1px; background: var(--line); }
-  .intro { margin: 0 auto; max-width: 480px; color: var(--muted); font-weight: 300; line-height: 1.6; }
-  .photo { width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 1px solid var(--line); padding: 5px; background: var(--paper); margin-bottom: 8px; }
+  /* ---------- Encabezado ---------- */
+  .hero { text-align: center; padding: 22px 14px 20px; margin-bottom: 16px; }
+  .hero .badge { display: inline-block; font-size: 8px; color: var(--yellow); border: 1px solid var(--yellow); border-radius: 4px; padding: 6px 8px; margin-bottom: 14px; letter-spacing: .08em; }
+  .hero h1 { margin: 0; font-size: clamp(16px, 5.4vw, 24px); line-height: 1.6; color: #ff8fc9; text-shadow: 0 0 6px rgba(255,63,164,.9), 0 0 18px rgba(255,63,164,.55); }
+  .hero .by { margin-top: 14px; font-size: 10px; color: var(--cyan); text-shadow: 0 0 8px rgba(56,189,248,.7); line-height: 1.8; }
+  .hero .intro { margin: 14px auto 0; font-size: 14px; color: #c4b5fd; line-height: 1.55; max-width: 420px; }
+  .photo { width: 110px; height: 110px; object-fit: cover; border-radius: 50%; border: 3px solid var(--cyan); box-shadow: 0 0 18px rgba(56,189,248,.55); margin-bottom: 14px; }
 
-  .countdown { display: flex; justify-content: center; gap: 22px; margin: 22px 0 4px; }
-  .countdown div { text-align: center; min-width: 52px; }
-  .countdown b { display: block; font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 500; font-size: 38px; line-height: 1; color: var(--sage-dark); }
-  .countdown span { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
-  .deadline { margin-top: 10px; font-size: 13px; color: var(--gold); text-align: center; }
+  .countdown { display: flex; justify-content: center; gap: 8px; margin-top: 18px; }
+  .countdown div { flex: 1; max-width: 72px; padding: 9px 4px 7px; border-radius: 8px; border: 1px solid var(--purple-dark); background: rgba(15,11,36,.85); text-align: center; }
+  .countdown b { display: block; font-family: 'Press Start 2P', monospace; font-size: 16px; color: var(--yellow); text-shadow: 0 0 8px rgba(253,224,71,.6); }
+  .countdown span { display: block; margin-top: 7px; font-size: 9px; color: #a78bfa; text-transform: uppercase; letter-spacing: .08em; }
+  .deadline { margin-top: 12px; font-size: 12px; color: #fca5a5; }
 
-  .panel { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 20px; }
-  .name-panel { margin: 26px 0 16px; }
-  label.lbl, .field-title { display: block; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+  /* ---------- Paneles / marcos neón ---------- */
+  .box {
+    position: relative; background: var(--panel); border: 2px solid var(--purple); border-radius: 14px;
+    box-shadow: 0 0 14px rgba(139,92,246,.30), inset 0 0 14px rgba(139,92,246,.12);
+    backdrop-filter: blur(10px);
+  }
+  .box.cyan { border-color: #06b6d4; box-shadow: 0 0 14px rgba(6,182,212,.32), inset 0 0 14px rgba(6,182,212,.12); }
+  .box::before, .box::after { content: ""; position: absolute; width: 9px; height: 9px; border: 2px solid var(--cyan); pointer-events: none; }
+  .box::before { top: -2px; left: -2px; border-right: 0; border-bottom: 0; border-top-left-radius: 4px; }
+  .box::after  { bottom: -2px; right: -2px; border-left: 0; border-top: 0; border-bottom-right-radius: 4px; }
+
+  .name-box { padding: 16px; margin-bottom: 14px; }
+  .lbl { display: block; font-size: 10px; color: #7dd3fc; margin-bottom: 12px; line-height: 1.6; }
 
   .grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
 
-  .card { position: relative; transition: border-color .25s; }
-  .card.done { border-color: var(--sage); }
-  .card .num { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 15px; color: var(--gold); }
-  .card.done .num::after { content: " ·  ✓"; color: var(--sage); }
-  .card h3 { margin: 2px 0 14px; font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 600; font-size: 21px; line-height: 1.2; }
+  /* Tarjeta SELECCIONADA (con el dedo encima) o ya respondida → borde rosa neón */
+  .card { padding: 16px 16px 18px; transition: border-color .2s, box-shadow .2s, transform .15s; }
+  .card:focus-within, .card.done {
+    border-color: var(--pink);
+    box-shadow: 0 0 6px rgba(255,63,164,.85), 0 0 20px rgba(255,63,164,.50), inset 0 0 14px rgba(255,63,164,.18);
+  }
+  .card:focus-within { transform: translateY(-2px); }
+  .card:focus-within::before, .card:focus-within::after, .card.done::before, .card.done::after { border-color: var(--pink); }
+  .card .tag { display: flex; justify-content: space-between; align-items: center; font-size: 8px; color: #a78bfa; margin-bottom: 10px; }
+  .card .tag .ok { color: var(--green); opacity: 0; transform: scale(.4); transition: .25s; font-size: 11px; }
+  .card.done .tag .ok { opacity: 1; transform: scale(1); }
+  .card h3 { margin: 0 0 14px; font-size: 16px; font-weight: 700; line-height: 1.35; display: flex; gap: 10px; align-items: flex-start; color: #fff; }
+  .card h3 .ic { font-size: 22px; line-height: 1.1; }
+  .card h3 small { font-weight: 400; color: #a78bfa; font-size: 12px; }
 
   input, select, textarea {
-    width: 100%; min-height: 50px; padding: 12px 14px; border-radius: 10px; font: inherit; font-size: 16px; /* 16px evita el zoom automático en iPhone */
-    background: #fdfcf9; border: 1px solid var(--line); color: var(--ink); transition: .2s;
+    width: 100%; min-height: 50px; padding: 12px 14px; border-radius: 10px;
+    font: inherit; font-size: 16px; /* 16px evita el zoom automático en iPhone */
+    background: rgba(15,11,36,.95); border: 1px solid #6d28d9; color: #fff; transition: .2s;
   }
-  select { appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
-    background-position: calc(100% - 18px) 50%, calc(100% - 13px) 50%; background-size: 5px 5px; background-repeat: no-repeat; padding-right: 34px; }
-  textarea { resize: vertical; min-height: 76px; }
-  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--sage); box-shadow: 0 0 0 3px rgba(125,145,129,.18); }
-  ::placeholder { color: #b5afa3; }
+  select { appearance: none; padding-right: 36px;
+    background-image: linear-gradient(45deg, transparent 50%, #a78bfa 50%), linear-gradient(135deg, #a78bfa 50%, transparent 50%);
+    background-position: calc(100% - 19px) 50%, calc(100% - 14px) 50%; background-size: 5px 5px; background-repeat: no-repeat; }
+  select option { background: #1a1238; color: #fff; }
+  textarea { resize: vertical; min-height: 80px; }
+  input[type="date"] { color-scheme: dark; }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--pink); box-shadow: 0 0 10px rgba(255,63,164,.55); }
+  ::placeholder { color: #7c72a6; }
 
-  .sendbar {
+  /* ---------- Botones arcade ---------- */
+  .btn {
+    position: relative; width: 100%; min-height: 54px; padding: 16px 18px; border: 0; border-radius: 10px; cursor: pointer;
+    font-family: 'Press Start 2P', monospace; font-size: 11px; line-height: 1.5; text-transform: uppercase; color: #fff;
+    transition: transform .1s, box-shadow .1s;
+  }
+  .btn.green  { background: linear-gradient(180deg, #22c55e, #15803d); box-shadow: 0 5px 0 #14532d, 0 8px 16px rgba(0,0,0,.45); }
+  .btn.purple { background: linear-gradient(180deg, #a855f7, #7e22ce); box-shadow: 0 5px 0 #581c87, 0 8px 16px rgba(0,0,0,.45); }
+  .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 rgba(0,0,0,.6); }
+  .link { background: none; border: 0; color: #a5b4fc; font: inherit; font-size: 13px; text-decoration: underline; cursor: pointer; padding: 8px 10px; }
+
+  /* ---------- Barra inferior fija (HUD) ---------- */
+  .hud {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 5;
-    padding: 10px 16px calc(12px + env(safe-area-inset-bottom));
-    background: rgba(250,247,242,.96); backdrop-filter: blur(8px); border-top: 1px solid var(--line);
+    padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+    background: rgba(9,5,20,.95); backdrop-filter: blur(10px); border-top: 2px solid var(--purple);
+    box-shadow: 0 -4px 22px rgba(139,92,246,.35);
   }
-  .sendbar-in { max-width: 520px; margin: 0 auto; text-align: center; }
-  .bar { height: 3px; background: var(--line); border-radius: 3px; overflow: hidden; }
-  .bar > i { display: block; height: 100%; width: 0; background: var(--sage); transition: width .35s; }
-  .sendbar small { display: block; margin: 6px 0 8px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
-  .sendbar .btn { max-width: none; }
-  .sendbar .link { margin-top: 6px; padding: 6px 10px; }
+  .hud-in { max-width: 520px; margin: 0 auto; text-align: center; }
+  .xp { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .xp .lv { font-size: 8px; color: var(--yellow); white-space: nowrap; }
+  .xp .bar { flex: 1; height: 14px; border-radius: 4px; background: rgba(255,255,255,.08); border: 1px solid var(--purple-dark); overflow: hidden; }
+  .xp .bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--purple), var(--pink), var(--yellow)); box-shadow: 0 0 10px rgba(255,63,164,.8); transition: width .35s; }
+  .xp .pct { font-size: 8px; color: var(--cyan); min-width: 34px; text-align: right; }
+  .hud .btn { font-size: 10px; }
+  .hud .link { padding: 6px 10px 0; font-size: 12px; }
 
-  .btn { width: 100%; max-width: 380px; min-height: 52px; padding: 15px 22px; border: 0; border-radius: 999px; font: inherit; font-weight: 500; font-size: 14px; letter-spacing: .12em; text-transform: uppercase; cursor: pointer; background: var(--sage-dark); color: #fff; transition: background .2s, transform .1s; }
-  .btn:hover { background: #4d6254; }
-  .btn:active { transform: scale(.985); }
-  .btn.ghost { background: transparent; color: var(--sage-dark); border: 1px solid var(--sage); }
-  .btn.ghost:hover { background: rgba(125,145,129,.1); }
-  .link { background: none; border: 0; color: var(--muted); font: inherit; font-size: 13px; text-decoration: underline; cursor: pointer; }
-
-  .thanks { display: none; text-align: center; padding: 30px 20px; margin-top: 16px; }
+  /* ---------- Gracias / compartir ---------- */
+  .thanks { display: none; text-align: center; padding: 28px 18px; margin-top: 16px; }
   .thanks.show { display: block; }
-  .thanks h2 { margin: 0 0 10px; font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 500; font-size: 30px; color: var(--sage-dark); }
-  .thanks p { color: var(--muted); line-height: 1.6; margin: 0 0 18px; }
+  .thanks h2 { margin: 0 0 14px; font-size: 13px; line-height: 1.7; color: var(--yellow); text-shadow: 0 0 10px rgba(253,224,71,.6); }
+  .thanks p { color: #d1d5db; font-size: 14px; line-height: 1.55; margin: 0 0 18px; }
 
-  .share { text-align: center; margin-top: 34px; }
-  .share img { padding: 8px; border: 1px solid var(--line); border-radius: 10px; background: #fff; width: 150px; height: 150px; }
-  .share p { margin: 10px 0 0; font-size: 13px; color: var(--muted); }
-  footer { text-align: center; margin-top: 30px; font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 18px; color: var(--blush); }
+  .share { text-align: center; margin-top: 26px; }
+  .share img { background: #fff; padding: 8px; border-radius: 10px; width: 150px; height: 150px; }
+  .share p { margin: 10px 0 0; font-size: 12px; color: #a78bfa; }
+  footer { text-align: center; margin-top: 26px; font-size: 9px; color: #a78bfa; line-height: 1.8; }
 
-  .toast { position: fixed; left: 50%; bottom: calc(160px + env(safe-area-inset-bottom)); transform: translate(-50%, 80px); opacity: 0; background: var(--ink); color: #fff;
-    padding: 12px 20px; border-radius: 999px; font-size: 14px; transition: .3s; z-index: 10; max-width: 90vw; text-align: center; }
+  /* ---------- Pantalla de inicio ---------- */
+  .start {
+    position: fixed; inset: 0; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 22px; padding: 28px; text-align: center; background: #090514;
+    background-image: radial-gradient(circle at 50% 38%, rgba(147,51,234,.4), transparent 62%);
+  }
+  .start.hide { display: none; }
+  .start h1 { margin: 0; font-size: clamp(17px, 6vw, 28px); line-height: 1.6; color: #ff8fc9; text-shadow: 0 0 6px rgba(255,63,164,.9), 0 0 22px rgba(255,63,164,.6); }
+  .start .names { font-size: 11px; color: var(--cyan); text-shadow: 0 0 8px rgba(56,189,248,.7); line-height: 1.8; }
+  .start .btn { max-width: 300px; }
+  .blink { font-size: 9px; color: var(--yellow); animation: blink 1s steps(2) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .music { position: fixed; top: calc(10px + env(safe-area-inset-top)); right: 10px; z-index: 15; width: 44px; height: 44px; border-radius: 50%;
+    border: 2px solid var(--purple); background: rgba(22,16,48,.92); font-size: 19px; cursor: pointer; }
+
+  .toast { position: fixed; left: 50%; bottom: calc(190px + env(safe-area-inset-bottom)); transform: translate(-50%, 80px); opacity: 0;
+    background: #1e1b4b; border: 2px solid var(--pink); box-shadow: 0 0 14px rgba(255,63,164,.5); color: #fff;
+    padding: 12px 18px; border-radius: 10px; font-size: 14px; transition: .3s; z-index: 30; max-width: 90vw; text-align: center; }
   .toast.show { transform: translate(-50%, 0); opacity: 1; }
 </style>
 </head>
 <body>
+
+<div class="start" id="start">
+  <img class="photo" id="photo-start" alt="" hidden>
+  <h1 class="px">BABY<br>PREDICTION<br>BINGO</h1>
+  <div class="names px">YESSI &amp; LUISMI</div>
+  <button type="button" class="btn green" id="btn-start">▶ Press Start</button>
+  <div class="blink px">INSERT PREDICTION</div>
+</div>
+<button type="button" class="music" id="btn-music" title="Música" hidden>🔇</button>
+
 <div class="wrap">
 
-  <header>
-    <img class="photo" id="photo" alt="" hidden>
-    <div class="eyebrow">Predicciones del bebé</div>
-    <h1 id="title">Yessi <em>&amp;</em> Luismi</h1>
-    <div class="orn">✦</div>
+  <header class="box hero">
+    <div class="badge px">GAMING EDITION</div>
+    <h1 class="px">BABY PREDICTION BINGO</h1>
+    <div class="by px">YESSI &amp; LUISMI</div>
     <p class="intro" id="intro"></p>
     <div class="countdown" id="countdown" hidden></div>
     <div class="deadline" id="deadline" hidden></div>
   </header>
 
   <form id="form" autocomplete="off" novalidate>
-    <div class="panel name-panel">
-      <label class="lbl" for="player">Tu nombre</label>
-      <input type="text" id="player" placeholder="¿Quién predice?" maxlength="40" autocapitalize="words" autocomplete="name" enterkeyhint="next">
+    <div class="box cyan name-box">
+      <label class="lbl px" for="player">👾 TU NOMBRE / PLAYER 1</label>
+      <input type="text" id="player" placeholder="Escribe tu nombre aquí..." maxlength="40" autocapitalize="words" autocomplete="name" enterkeyhint="next">
     </div>
 
     <div class="grid">
-      <div class="panel card" data-card>
-        <div class="num">01</div><h3>¿A quién se parecerá más?</h3>
+      <div class="box card" data-card>
+        <div class="tag px"><span>CARD 01</span><span class="ok">✔</span></div>
+        <h3><span class="ic">👨‍👩‍👦</span>¿A quién se parecerá más?</h3>
         <select id="resemble">
-          <option value="">Selecciona una opción</option>
+          <option value="">Selecciona una opción...</option>
           <option>Mamá</option><option>Papá</option><option>Mitad y mitad</option>
         </select>
       </div>
 
-      <div class="panel card" data-card>
-        <div class="num">02</div><h3>Fecha de nacimiento</h3>
+      <div class="box card" data-card>
+        <div class="tag px"><span>CARD 02</span><span class="ok">✔</span></div>
+        <h3><span class="ic">📅</span>Fecha de nacimiento</h3>
         <input type="date" id="birthdate">
       </div>
 
-      <div class="panel card" data-card>
-        <div class="num">03</div><h3>Peso al nacer</h3>
+      <div class="box card" data-card>
+        <div class="tag px"><span>CARD 03</span><span class="ok">✔</span></div>
+        <h3><span class="ic">⚖️</span>Peso al nacer</h3>
         <input type="text" id="weight" placeholder="Ej: 3.2 kg" maxlength="20" inputmode="decimal" enterkeyhint="next">
       </div>
 
-      <div class="panel card" data-card>
-        <div class="num">04</div><h3>Color de ojos</h3>
+      <div class="box card" data-card>
+        <div class="tag px"><span>CARD 04</span><span class="ok">✔</span></div>
+        <h3><span class="ic">👁️</span>Color de ojos</h3>
         <select id="eyes">
-          <option value="">Selecciona una opción</option>
+          <option value="">Selecciona una opción...</option>
           <option>Marrones / oscuros</option><option>Azules</option><option>Verdes</option><option>Miel / cambiantes</option>
         </select>
       </div>
 
-      <div class="panel card" data-card>
-        <div class="num">05</div><h3>Longitud</h3>
+      <div class="box card" data-card>
+        <div class="tag px"><span>CARD 05</span><span class="ok">✔</span></div>
+        <h3><span class="ic">📏</span>Predicción de longitud</h3>
         <input type="text" id="length" placeholder="Ej: 50 cm" maxlength="20" inputmode="decimal" enterkeyhint="next">
       </div>
 
-      <div class="panel card" data-card>
-        <div class="num">06</div><h3>Momento del día en que nacerá</h3>
+      <div class="box card" data-card>
+        <div class="tag px"><span>CARD 06</span><span class="ok">✔</span></div>
+        <h3><span class="ic">🌗</span>¿En qué momento del día nacerá?</h3>
         <select id="time">
-          <option value="">Selecciona una opción</option>
+          <option value="">Selecciona una opción...</option>
           <option>Madrugada (12 am – 6 am)</option>
           <option>Mañana (6 am – 12 pm)</option>
           <option>Tarde (12 pm – 7 pm)</option>
@@ -158,72 +236,80 @@
         </select>
       </div>
 
-      <div class="panel card" data-card>
-        <div class="num">07</div><h3>¿Tendrá mucho pelo?</h3>
+      <div class="box card" data-card>
+        <div class="tag px"><span>CARD 07</span><span class="ok">✔</span></div>
+        <h3><span class="ic">💇</span>¿Tendrá mucho pelo?</h3>
         <select id="hair">
-          <option value="">Selecciona una opción</option>
+          <option value="">Selecciona una opción...</option>
           <option>Mucho pelo</option><option>Poco pelo</option><option>Calvito</option>
         </select>
       </div>
 
-      <div class="panel card" data-card>
-        <div class="num">08</div><h3>¿Quién la o lo carga primero?</h3>
+      <div class="box card" data-card>
+        <div class="tag px"><span>CARD 08</span><span class="ok">✔</span></div>
+        <h3><span class="ic">👍</span>¿Quién lo carga primero?</h3>
         <select id="hands">
-          <option value="">Selecciona una opción</option>
+          <option value="">Selecciona una opción...</option>
           <option>Mamá</option><option>Papá</option>
         </select>
       </div>
 
-      <div class="panel card" data-card>
-        <div class="num">09</div><h3>¿Llorará al nacer?</h3>
+      <div class="box card" data-card>
+        <div class="tag px"><span>CARD 09</span><span class="ok">✔</span></div>
+        <h3><span class="ic">🔊</span>¿Llorará al nacer?</h3>
         <select id="cry">
-          <option value="">Selecciona una opción</option>
+          <option value="">Selecciona una opción...</option>
           <option>Sí, a todo pulmón</option><option>Un poco</option><option>No, muy tranquilo</option>
         </select>
       </div>
 
-      <div class="panel card" data-card id="card-sex">
-        <div class="num">10</div><h3>¿Niño o niña?</h3>
+      <div class="box card" data-card id="card-sex">
+        <div class="tag px"><span>CARD 10</span><span class="ok">✔</span></div>
+        <h3><span class="ic">🍼</span>¿Niño o niña?</h3>
         <select id="sex">
-          <option value="">Selecciona una opción</option>
+          <option value="">Selecciona una opción...</option>
           <option>Niño</option><option>Niña</option>
         </select>
       </div>
 
-      <div class="panel card wide" data-card>
-        <div class="num">11</div><h3>¿Qué nombre le pondrán?</h3>
-        <input type="text" id="babyname" placeholder="Tu mejor apuesta" maxlength="30" autocapitalize="words" enterkeyhint="done">
+      <div class="box card" data-card>
+        <div class="tag px"><span>CARD 11</span><span class="ok">✔</span></div>
+        <h3><span class="ic">✍️</span>¿Qué nombre le pondrán?</h3>
+        <input type="text" id="babyname" placeholder="Tu mejor apuesta..." maxlength="30" autocapitalize="words" enterkeyhint="done">
       </div>
 
-      <div class="panel card wide" data-card>
-        <div class="num">Extra</div><h3>Un mensaje para el bebé <span style="font-size:14px;color:var(--muted);font-weight:400">(opcional)</span></h3>
-        <textarea id="message" placeholder="Un deseo, un consejo, unas palabras de cariño…" maxlength="200"></textarea>
+      <div class="box card" data-card>
+        <div class="tag px"><span>BONUS</span><span class="ok">✔</span></div>
+        <h3><span class="ic">💌</span><span>Mensaje para el bebé <small>(opcional)</small></span></h3>
+        <textarea id="message" placeholder="Un deseo, un consejo, un chiste..." maxlength="200"></textarea>
       </div>
     </div>
-
   </form>
 
-  <section class="panel thanks" id="thanks">
-    <h2>¡Gracias por participar!</h2>
-    <p>Si WhatsApp se abrió, solo pulsa <b>Enviar</b> en el chat para que tu predicción llegue.<br>
+  <section class="box thanks" id="thanks">
+    <h2 class="px">🎉 ¡PREDICCIÓN<br>ENVIADA!</h2>
+    <p>Si WhatsApp se abrió, pulsa <b>Enviar</b> en el chat para que tu predicción llegue.<br>
        Si no se abrió, usa «copiar mi predicción» y envíala por mensaje.</p>
-    <button type="button" class="btn ghost" id="btn-again">Hacer otra predicción</button>
+    <button type="button" class="btn purple" id="btn-again">Otra predicción</button>
   </section>
 
   <section class="share" id="share">
-    <button type="button" class="btn ghost" id="btn-share" style="margin:0 auto" hidden>Compartir con alguien</button>
+    <button type="button" class="btn purple" id="btn-share" style="max-width:300px" hidden>Compartir el juego</button>
     <img id="qr" alt="Código QR" hidden>
     <p id="qr-note" hidden>Escanea el código o comparte el enlace.</p>
   </section>
 
-  <footer>Con cariño, Yessi &amp; Luismi</footer>
+  <footer class="px">🎮 BABY PREDICTION BINGO 🎮<br>YESSI &amp; LUISMI</footer>
 </div>
 
-<div class="sendbar">
-  <div class="sendbar-in">
-    <div class="bar"><i id="bar"></i></div>
-    <small id="progress-text"></small>
-    <button type="button" class="btn" id="btn-send">Enviar por WhatsApp</button>
+<div class="hud">
+  <div class="hud-in">
+    <div class="xp">
+      <span class="lv px" id="lv">LV 0</span>
+      <div class="bar"><i id="bar"></i></div>
+      <span class="pct px" id="pct">0%</span>
+    </div>
+    <button type="button" class="btn green" id="btn-send">📲 Enviar por WhatsApp</button>
     <button type="button" class="link" id="btn-copy">o copiar mi predicción</button>
   </div>
 </div>
@@ -235,12 +321,12 @@
 const CONFIG = {
   // Número que RECIBE las predicciones. Con código de país, solo dígitos, sin "+" ni espacios.
   telefono: "34692858550",
-  titulo: "",                   // "" = usa el título del encabezado (Yessi & Luismi)
-  mensaje: "Estamos a la espera de nuestro bebé. Cuéntanos cómo te lo imaginas: llena tus predicciones y envíalas por WhatsApp. ¡Quien más acierte se llevará una sorpresa!",
+  mensaje: "Estamos esperando a nuestro bebé. Llena tus predicciones y envíalas por WhatsApp. ¡Gana quien acierte más!",
   fechaProbable: "2026-11-25",  // "AAAA-MM-DD" para la cuenta regresiva; "" para ocultarla
   fechaLimite: "",              // "AAAA-MM-DD": último día para participar; "" = sin límite
   foto: "",                     // ej. "foto.jpg" (súbela al repo junto a index.html); "" = sin foto
   preguntarSexo: true,          // false si ya se sabe y no quieres la pregunta
+  musica: true,                 // música retro (se activa al pulsar START)
   hoja: "",                     // URL del Apps Script (termina en /exec); "" = solo WhatsApp
 };
 // ========================================================
@@ -251,7 +337,6 @@ if (!CONFIG.preguntarSexo) { $("card-sex").remove(); FIELDS = FIELDS.filter(f =>
 const DRAFT_KEY = "baby_prediction_draft";
 
 $("intro").textContent = CONFIG.mensaje;
-if (CONFIG.titulo) $("title").textContent = CONFIG.titulo;
 
 function toast(msg) {
   const t = $("toast"); t.textContent = msg; t.classList.add("show");
@@ -275,8 +360,10 @@ function updateProgress() {
     if (ok) done++;
   });
   $("message").closest("[data-card]").classList.toggle("done", !!$("message").value.trim());
-  $("bar").style.width = (done / keys.length * 100) + "%";
-  $("progress-text").textContent = `${done} de ${keys.length} respondidas`;
+  const pct = Math.round(done / keys.length * 100);
+  $("bar").style.width = pct + "%";
+  $("pct").textContent = pct + "%";
+  $("lv").textContent = done === keys.length ? "MAX" : "LV " + done;
 }
 
 function saveDraft() { try { localStorage.setItem(DRAFT_KEY, JSON.stringify(read())); } catch (e) {} }
@@ -287,6 +374,7 @@ function loadDraft() {
   } catch (e) {}
 }
 
+// Si cambias estas etiquetas, cámbialas igual en admin.html
 function buildText(d) {
   const v = (x, fb) => x || fb;
   return [
@@ -311,10 +399,10 @@ function buildText(d) {
 const limite = CONFIG.fechaLimite ? new Date(CONFIG.fechaLimite + "T23:59:59") : null;
 
 function validate() {
-  if (limite && new Date() > limite) { toast("El plazo para participar ya terminó"); return null; }
+  if (limite && new Date() > limite) { toast("⏰ El plazo para participar ya terminó"); return null; }
   const d = read();
   if (!d.player) {
-    toast("Escribe tu nombre primero");
+    toast("👾 Escribe tu nombre primero");
     $("player").focus(); $("player").scrollIntoView({ behavior: "smooth", block: "center" });
     return null;
   }
@@ -343,7 +431,7 @@ $("btn-send").onclick = () => {
 
 $("btn-copy").onclick = async () => {
   const d = validate(); if (!d) return;
-  try { await navigator.clipboard.writeText(buildText(d)); toast("Copiado. Pégalo en un mensaje"); }
+  try { await navigator.clipboard.writeText(buildText(d)); toast("📋 ¡Copiado! Pégalo en un mensaje"); }
   catch (e) { prompt("Copia tu predicción:", buildText(d)); }
 };
 
@@ -359,12 +447,12 @@ $("form").addEventListener("input", () => { updateProgress(); saveDraft(); });
 loadDraft(); updateProgress();
 
 // ---- Foto ----
-if (CONFIG.foto) { $("photo").src = CONFIG.foto; $("photo").hidden = false; }
+if (CONFIG.foto) { $("photo-start").src = CONFIG.foto; $("photo-start").hidden = false; }
 
 // ---- Fecha límite ----
 if (limite) {
   const dl = $("deadline"); dl.hidden = false;
-  dl.textContent = new Date() > limite ? "El plazo para participar terminó" : "Participa hasta el " + formatDate(CONFIG.fechaLimite);
+  dl.textContent = new Date() > limite ? "⏰ El plazo para participar terminó" : "⏰ Participa hasta el " + formatDate(CONFIG.fechaLimite);
 }
 
 // ---- Cuenta regresiva ----
@@ -372,18 +460,17 @@ if (CONFIG.fechaProbable) {
   const target = new Date(CONFIG.fechaProbable + "T00:00:00"), box = $("countdown");
   const tick = () => {
     const ms = target - new Date();
-    if (ms <= 0) { box.innerHTML = '<div><b style="font-size:26px">¡Ya casi!</b></div>'; return; }
+    if (ms <= 0) { box.innerHTML = '<div style="max-width:none;padding:10px 16px"><b>¡YA CASI!</b></div>'; return; }
     const d = Math.floor(ms / 864e5), h = Math.floor(ms / 36e5) % 24, m = Math.floor(ms / 6e4) % 60, s = Math.floor(ms / 1e3) % 60;
     box.innerHTML = [[d, "días"], [h, "horas"], [m, "min"], [s, "seg"]].map(([n, l]) => `<div><b>${n}</b><span>${l}</span></div>`).join("");
   };
   box.hidden = false; tick(); setInterval(tick, 1000);
 }
 
-// ---- QR del enlace (imagen generada por api.qrserver.com) ----
+// ---- Compartir (menú nativo en el celular; QR si no existe) ----
 if (location.protocol.startsWith("http")) {
   const url = location.href.split("#")[0];
   if (navigator.share) {
-    // En el celular: menú nativo de compartir (WhatsApp, etc.)
     $("btn-share").hidden = false;
     $("btn-share").onclick = () => navigator.share({ title: document.title, text: "¡Haz tu predicción del bebé de Yessi y Luismi!", url }).catch(() => {});
   } else {
@@ -393,6 +480,28 @@ if (location.protocol.startsWith("http")) {
 } else {
   $("share").hidden = true; // en local (file://) no hay enlace que compartir
 }
+
+// ---- Música chiptune (WebAudio, sin archivos) ----
+let ac, musicTimer, musicOn = false, step = 0;
+const NOTES = [262, 330, 392, 523, 392, 330, 294, 349, 440, 587, 440, 349, 247, 330, 392, 494];
+function beep() {
+  const o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime;
+  o.type = "square"; o.frequency.value = NOTES[step++ % NOTES.length];
+  g.gain.setValueAtTime(.035, t); g.gain.exponentialRampToValueAtTime(.001, t + .22);
+  o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t + .24);
+}
+function setMusic(on) {
+  musicOn = on; $("btn-music").textContent = on ? "🔊" : "🔇";
+  if (on) { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume(); musicTimer = setInterval(beep, 240); }
+  else clearInterval(musicTimer);
+}
+$("btn-music").onclick = () => setMusic(!musicOn);
+
+// ---- Pantalla de inicio ----
+$("btn-start").onclick = () => {
+  $("start").classList.add("hide");
+  if (CONFIG.musica) { $("btn-music").hidden = false; setMusic(true); }
+};
 </script>
 </body>
 </html>

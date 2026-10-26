@@ -193,6 +193,9 @@ function dist(q, s) {
   return num(s);
 }
 
+// Distancia al valor real, redondeada para que los empates (3.2 y 3.4 frente a 3.3) se detecten
+const gap = (q, s, r) => Math.round(Math.abs(dist(q, s) - r) * 1e6) / 1e6;
+
 function realValues() {
   return Q.map((q, i) => {
     let v = $("r" + i).value.trim();
@@ -221,7 +224,7 @@ function render() {
     if ((q.t !== "num" && q.t !== "date") || !real[i]) return null;
     const r = dist(q, real[i]);
     if (isNaN(r)) return null;
-    const ds = LIST.map(p => Math.abs(dist(q, p.a[i]) - r)).filter(d => !isNaN(d));
+    const ds = LIST.map(p => gap(q, p.a[i], r)).filter(d => !isNaN(d));
     return ds.length ? { r, min: Math.min(...ds) } : null;
   });
 
@@ -230,7 +233,7 @@ function render() {
       if (q.t === "num" || q.t === "date") {
         const c = closest[i];
         if (!c) return false;
-        const d = Math.abs(dist(q, p.a[i]) - c.r);
+        const d = gap(q, p.a[i], c.r);
         return !isNaN(d) && d === c.min;
       }
       return hit(q, real[i], p.a[i]);

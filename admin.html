@@ -2,49 +2,129 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0d0a1d">
 <meta name="robots" content="noindex">
-<title>Bingo - Ganadores</title>
+<title>Admin · Baby Bingo</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-  body { margin: 0; padding: 24px 16px; font-family: 'Jost', system-ui, sans-serif; background: #faf7f2; color: #3a3834; }
-  .wrap { max-width: 900px; margin: 0 auto; }
-  h1 { font-family: Georgia, serif; font-weight: 500; font-size: 30px; color: #5c7263; }
-  h2 { font-family: Georgia, serif; font-weight: 500; font-size: 20px; color: #3a3834; margin: 26px 0 8px; }
-  .box { background: #fff; border: 1px solid #e7dfd1; border-radius: 14px; padding: 16px; }
-  .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
-  label { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: #8a857b; display: block; margin-bottom: 4px; }
-  input, select, textarea { width: 100%; padding: 10px; border-radius: 9px; border: 1px solid #e7dfd1; background: #fdfcf9; color: #3a3834; font: inherit; box-sizing: border-box; }
-  textarea { min-height: 200px; }
-  button { margin-top: 12px; padding: 12px 26px; border: 0; border-radius: 999px; background: #5c7263; color: #fff; font-weight: 500; font-size: 14px; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; }
-  table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
-  th, td { padding: 8px; border-bottom: 1px solid #efe8da; text-align: left; }
-  td.ok { color: #5c7263; font-weight: 700; } td.no { color: #c9c3b6; }
-  .winner td { background: #f3efe3; font-weight: 700; }
-  .note { font-size: 12px; color: #8a857b; margin: 6px 0 0; }
+  :root { --purple: #8b5cf6; --purple-dark: #4c1d95; --cyan: #38bdf8; --yellow: #fde047; --pink: #ff3fa4; --green: #22c55e; }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    -webkit-tap-highlight-color: transparent;
+    margin: 0; padding: 18px 14px calc(40px + env(safe-area-inset-bottom)); min-height: 100vh;
+    font-family: 'Inter', system-ui, sans-serif; color: #f3f4f6; background: #0d0a1d;
+    background-image: radial-gradient(circle at 15% 10%, rgba(147,51,234,.22), transparent 40%),
+                      radial-gradient(circle at 85% 90%, rgba(6,182,212,.18), transparent 40%),
+                      linear-gradient(180deg, #090514, #120b29);
+    background-attachment: fixed;
+  }
+  .wrap { max-width: 560px; margin: 0 auto; }
+  .px { font-family: 'Press Start 2P', monospace; }
+
+  header { text-align: center; padding: 6px 0 18px; }
+  header h1 { margin: 0; font-size: clamp(14px, 4.8vw, 20px); line-height: 1.6; color: #ff8fc9; text-shadow: 0 0 6px rgba(255,63,164,.9), 0 0 18px rgba(255,63,164,.5); }
+  header p { margin: 10px 0 0; font-size: 13px; color: #a78bfa; }
+
+  .box { background: rgba(22,16,48,.82); border: 2px solid var(--purple); border-radius: 14px; padding: 16px; margin-bottom: 14px;
+    box-shadow: 0 0 14px rgba(139,92,246,.3), inset 0 0 14px rgba(139,92,246,.12); }
+  .step { font-size: 9px; color: var(--yellow); line-height: 1.7; margin: 0 0 12px; }
+  .hint { font-size: 12px; color: #a78bfa; line-height: 1.5; margin: 10px 0 0; }
+
+  .fields { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  label { display: block; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: #7dd3fc; margin-bottom: 6px; }
+  input, select, textarea {
+    width: 100%; min-height: 48px; padding: 11px 13px; border-radius: 10px; font: inherit; font-size: 16px;
+    background: rgba(15,11,36,.95); border: 1px solid #6d28d9; color: #fff;
+  }
+  select { appearance: none; padding-right: 34px;
+    background-image: linear-gradient(45deg, transparent 50%, #a78bfa 50%), linear-gradient(135deg, #a78bfa 50%, transparent 50%);
+    background-position: calc(100% - 18px) 50%, calc(100% - 13px) 50%; background-size: 5px 5px; background-repeat: no-repeat; }
+  select option { background: #1a1238; }
+  input[type="date"] { color-scheme: dark; }
+  textarea { min-height: 150px; resize: vertical; }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--pink); box-shadow: 0 0 10px rgba(255,63,164,.55); }
+  .filled { border-color: var(--green); }
+
+  .btn { width: 100%; min-height: 52px; padding: 15px; border: 0; border-radius: 10px; cursor: pointer; color: #fff;
+    font-family: 'Press Start 2P', monospace; font-size: 10px; line-height: 1.5; text-transform: uppercase; transition: transform .1s, box-shadow .1s; }
+  .btn.green  { background: linear-gradient(180deg, #22c55e, #15803d); box-shadow: 0 5px 0 #14532d, 0 8px 16px rgba(0,0,0,.45); }
+  .btn.purple { background: linear-gradient(180deg, #a855f7, #7e22ce); box-shadow: 0 5px 0 #581c87, 0 8px 16px rgba(0,0,0,.45); }
+  .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 rgba(0,0,0,.6); }
+  .btn + .btn, .btn + details { margin-top: 14px; }
+  .link { background: none; border: 0; color: #a5b4fc; font: inherit; font-size: 13px; text-decoration: underline; cursor: pointer; padding: 8px 4px; }
+
+  details.paste { margin-top: 14px; }
+  details.paste > summary { cursor: pointer; font-size: 13px; color: #a5b4fc; padding: 8px 0; }
+  details.paste textarea { margin: 8px 0 12px; }
+
+  /* ---------- Ranking ---------- */
+  .stats { display: flex; gap: 8px; margin-bottom: 14px; }
+  .stats div { flex: 1; text-align: center; padding: 10px 4px; border-radius: 10px; border: 1px solid var(--purple-dark); background: rgba(15,11,36,.85); }
+  .stats b { display: block; font-family: 'Press Start 2P', monospace; font-size: 15px; color: var(--yellow); }
+  .stats span { display: block; margin-top: 7px; font-size: 10px; color: #a78bfa; }
+
+  .player { margin-bottom: 10px; border: 2px solid var(--purple-dark); border-radius: 12px; background: rgba(15,11,36,.85); overflow: hidden; }
+  .player.gold { border-color: var(--yellow); box-shadow: 0 0 14px rgba(253,224,71,.4); }
+  .player summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 12px; padding: 13px 14px; min-height: 56px; }
+  .player summary::-webkit-details-marker { display: none; }
+  .player .medal { font-size: 22px; min-width: 32px; text-align: center; }
+  .player .medal.n { font-family: 'Press Start 2P', monospace; font-size: 11px; color: #a78bfa; }
+  .player .who { flex: 1; font-weight: 700; font-size: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .player .pts { font-family: 'Press Start 2P', monospace; font-size: 13px; color: var(--yellow); }
+  .player .pts small { font-size: 8px; color: #a78bfa; }
+  .detail { padding: 2px 14px 14px; border-top: 1px solid var(--purple-dark); }
+  .detail div { display: flex; gap: 8px; align-items: baseline; padding: 8px 0; border-bottom: 1px solid rgba(76,29,149,.5); font-size: 14px; }
+  .detail div:last-child { border: 0; }
+  .detail .mk { width: 18px; font-weight: 700; }
+  .detail .ok .mk { color: var(--green); } .detail .no .mk { color: #6b7280; }
+  .detail .q { color: #a78bfa; min-width: 92px; font-size: 12px; }
+  .detail .a { flex: 1; word-break: break-word; }
+  .detail .no .a { color: #9ca3af; }
+  .detail .real { display: block; font-size: 11px; color: var(--green); }
+
+  .winner-box { text-align: center; padding: 16px; border: 2px solid var(--yellow); border-radius: 12px; margin-bottom: 14px;
+    background: rgba(253,224,71,.08); box-shadow: 0 0 14px rgba(253,224,71,.3); }
+  .winner-box h3 { margin: 0 0 8px; font-size: 11px; line-height: 1.7; color: var(--yellow); }
+  .winner-box p { margin: 0; font-size: 16px; font-weight: 700; }
+
+  .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); transform: translate(-50%, 80px); opacity: 0;
+    background: #1e1b4b; border: 2px solid var(--pink); color: #fff; padding: 12px 18px; border-radius: 10px; font-size: 14px; transition: .3s; z-index: 30; }
+  .toast.show { transform: translate(-50%, 0); opacity: 1; }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>🏆 Calcular ganadores</h1>
-  <p class="note">Todo ocurre en tu navegador: nada se sube a ningún lado. Úsalo cuando el bebé ya haya nacido.</p>
 
-  <h2>1. Resultados reales</h2>
-  <div class="box row" id="real"></div>
-  <p class="note">Tolerancias para dar punto: peso ±0.1 kg · longitud ±1 cm. Fecha y momento del día exactos. Nombre: coincide si contiene el mismo texto. Deja en blanco lo que no quieras puntuar.</p>
+  <header>
+    <h1 class="px">PANEL DE GANADORES</h1>
+    <p>Yessi &amp; Luismi · todo se calcula en tu navegador</p>
+  </header>
 
-  <h2>2. Predicciones</h2>
-  <div class="box">
-    <button id="load" style="margin-top:0">Cargar desde la hoja de Google</button>
-    <p class="note">O, como respaldo, pega abajo los mensajes de WhatsApp:</p>
-    <textarea id="msgs" placeholder="Pega todos los mensajes juntos. Cada uno debe empezar con «PREDICCIÓN DEL BEBÉ»."></textarea>
-    <button id="go">Calcular puntos</button>
-  </div>
+  <section class="box">
+    <h2 class="step px">1 · RESULTADOS REALES</h2>
+    <div class="fields" id="real"></div>
+    <p class="hint">Se guardan en este teléfono. Deja vacío lo que quieras ignorar. Tolerancia: peso ±0.1 kg · longitud ±1 cm. Fecha y momento del día, exactos.</p>
+    <button type="button" class="link" id="clear-real">Borrar resultados</button>
+  </section>
+
+  <section class="box">
+    <h2 class="step px">2 · PREDICCIONES</h2>
+    <button type="button" class="btn green" id="load">📥 Cargar desde la hoja de Google</button>
+    <details class="paste">
+      <summary>O pegar mensajes de WhatsApp (respaldo)</summary>
+      <textarea id="msgs" placeholder="Pega los mensajes. Cada uno empieza con «PREDICCIÓN DEL BEBÉ»."></textarea>
+      <button type="button" class="btn purple" id="go">Calcular con lo pegado</button>
+    </details>
+  </section>
 
   <div id="out"></div>
 </div>
+<div class="toast" id="toast"></div>
 
 <script>
-// key = etiqueta tal como aparece en el mensaje de WhatsApp; type = cómo se compara
+// k = etiqueta tal como aparece en el mensaje de WhatsApp; t = cómo se compara
 const Q = [
   { k: "Parecido", t: "sel", o: ["Mamá", "Papá", "Mitad y mitad"] },
   { k: "Fecha", t: "date" },
@@ -56,32 +136,60 @@ const Q = [
   { k: "Primeras manos", t: "sel", o: ["Mamá", "Papá"] },
   { k: "Llanto", t: "sel", o: ["Sí, a todo pulmón", "Un poco", "No, muy tranquilo"] },
   { k: "Sexo", t: "sel", o: ["Niño", "Niña"] },
-  { k: "Nombre del bebé", t: "txt" },
+  { k: "Nombre del bebé", t: "txt", ph: "nombre real" },
 ];
 const SHEET_URL = "https://script.google.com/macros/s/AKfycbwOIaIkuJJZ4hR15rWOeo7Y7uyndIpOYdFli_r9CaIEPJB7WYaroTa_o4DDGYnipAtqyA/exec";   // URL del Apps Script (termina en /exec)
+const REAL_KEY = "bingo_real";
 const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
+let LIST = [];   // últimas predicciones cargadas; se recalculan al cambiar los resultados reales
+
+function toast(msg) {
+  const t = $("toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove("show"), 2500);
+}
+
+// ---- Formulario de resultados reales ----
 $("real").innerHTML = Q.map((q, i) => {
   let f;
   if (q.t === "sel") f = `<select id="r${i}"><option value="">—</option>${q.o.map(o => `<option>${o}</option>`).join("")}</select>`;
   else if (q.t === "date") f = `<input id="r${i}" type="date">`;
-  else if (q.t === "time") f = `<input id="r${i}" type="time">`;
-  else f = `<input id="r${i}" type="text" placeholder="${q.ph || ""}">`;
-  return `<div><label>${q.k}</label>${f}</div>`;
+  else f = `<input id="r${i}" type="text" placeholder="${q.ph || ""}" ${q.t === "num" ? 'inputmode="decimal"' : ""}>`;
+  return `<div><label for="r${i}">${q.k}</label>${f}</div>`;
 }).join("");
 
-const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").trim();
+function saveReal() {
+  try { localStorage.setItem(REAL_KEY, JSON.stringify(Q.map((q, i) => $("r" + i).value))); } catch (e) {}
+}
+function loadReal() {
+  try { (JSON.parse(localStorage.getItem(REAL_KEY) || "[]")).forEach((v, i) => { if ($("r" + i)) $("r" + i).value = v; }); } catch (e) {}
+}
+function markFilled() { Q.forEach((q, i) => $("r" + i).classList.toggle("filled", !!$("r" + i).value)); }
+
+$("real").addEventListener("input", () => { markFilled(); saveReal(); if (LIST.length) render(); });
+$("clear-real").onclick = () => { Q.forEach((q, i) => $("r" + i).value = ""); markFilled(); saveReal(); if (LIST.length) render(); };
+loadReal(); markFilled();
+
+// ---- Comparación ----
+const norm = s => String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").trim();
 const num = s => parseFloat(String(s).replace(",", ".").replace(/[^\d.]/g, ""));
-const mins = s => { const m = /(\d{1,2}):(\d{2})/.exec(s); return m ? +m[1] * 60 + +m[2] : NaN; };
 
 function hit(q, real, guess) {
   if (!real || !guess || guess === "—") return false;
   switch (q.t) {
     case "sel": case "date": return real === guess;
     case "num": { const a = num(real), b = num(guess); return !isNaN(a) && !isNaN(b) && Math.abs(a - b) <= q.tol + 1e-9; }
-    case "time": { const a = mins(real), b = mins(guess); return !isNaN(a) && !isNaN(b) && Math.abs(a - b) <= 30; }
     default: return norm(guess).includes(norm(real)) || norm(real).includes(norm(guess));
   }
+}
+
+function realValues() {
+  return Q.map((q, i) => {
+    let v = $("r" + i).value.trim();
+    if (q.t === "date" && v) { const [y, m, d] = v.split("-"); v = `${d}/${m}/${y}`; }
+    return v;
+  });
 }
 
 function parse(block) {
@@ -93,47 +201,75 @@ function parse(block) {
   return { name: p ? p[1].trim() : "(sin nombre)", a: Q.map(q => get(q.k)) };
 }
 
-function render(list) {
-  const real = Q.map((q, i) => {
-    let v = $("r" + i).value.trim();
-    if (q.t === "date" && v) { const [y, m, d] = v.split("-"); v = `${d}/${m}/${y}`; }
-    return v;
-  });
-  if (!list.length) { $("out").innerHTML = '<p class="note">No encontré predicciones.</p>'; return; }
+// ---- Ranking ----
+function render() {
+  if (!LIST.length) { $("out").innerHTML = '<div class="box"><p class="hint" style="margin:0">No encontré predicciones todavía.</p></div>'; return; }
+  const real = realValues();
+  const given = real.filter(Boolean).length;
 
-  const rows = list.map(p => {
+  const rows = LIST.map(p => {
     const res = Q.map((q, i) => hit(q, real[i], p.a[i]));
     return { ...p, res, pts: res.filter(Boolean).length };
   }).sort((a, b) => b.pts - a.pts);
 
   const top = rows[0].pts;
-  $("out").innerHTML = `<h2>3. Resultados</h2>
-  <div class="box" style="overflow-x:auto"><table>
-    <tr><th>#</th><th>Jugador</th><th>Pts</th>${Q.map(q => `<th>${q.k}</th>`).join("")}</tr>
-    ${rows.map((r, i) => `<tr class="${r.pts === top && top > 0 ? "winner" : ""}">
-      <td>${i + 1}</td><td>${r.name.replace(/</g, "&lt;")}</td><td><b>${r.pts}</b></td>
-      ${r.res.map(ok => `<td class="${ok ? "ok" : "no"}">${ok ? "✔" : "·"}</td>`).join("")}</tr>`).join("")}
-  </table></div>
-  <p class="note">${top > 0 ? "🏆 Gana: " + rows.filter(r => r.pts === top).map(r => r.name).join(", ") + " con " + top + " punto(s)." : "Nadie acertó todavía."}</p>`;
+  const winners = top > 0 ? rows.filter(r => r.pts === top) : [];
+  const medals = ["🥇", "🥈", "🥉"];
+
+  window.RANKING_TEXT = given
+    ? "🏆 *RESULTADOS DEL BABY BINGO*\n" + rows.map((r, i) => `${medals[i] || (i + 1) + "."} ${r.name} — ${r.pts} pts`).join("\n")
+    : "";
+
+  $("out").innerHTML = `
+    <div class="stats">
+      <div><b>${rows.length}</b><span>jugadores</span></div>
+      <div><b>${given}/${Q.length}</b><span>resultados</span></div>
+      <div><b>${top}</b><span>máx. puntos</span></div>
+    </div>
+    ${!given ? '<p class="hint" style="text-align:center;margin:0 0 14px">Llena los resultados reales (paso 1) para calcular los puntos.</p>' : ""}
+    ${winners.length ? `<div class="winner-box"><h3 class="px">🏆 ${winners.length > 1 ? "EMPATE" : "GANADOR/A"}</h3><p>${winners.map(w => esc(w.name)).join(" · ")}</p></div>` : ""}
+    ${rows.map((r, i) => `
+      <details class="player ${winners.includes(r) ? "gold" : ""}">
+        <summary>
+          <span class="medal ${i < 3 && given ? "" : "n"}">${i < 3 && given ? medals[i] : i + 1}</span>
+          <span class="who">${esc(r.name)}</span>
+          <span class="pts">${r.pts}<small> pts</small></span>
+        </summary>
+        <div class="detail">
+          ${Q.map((q, j) => `<div class="${r.res[j] ? "ok" : "no"}">
+            <span class="mk">${r.res[j] ? "✔" : "·"}</span><span class="q">${q.k}</span>
+            <span class="a">${esc(r.a[j] || "—")}${real[j] && !r.res[j] ? `<span class="real">Real: ${esc(real[j])}</span>` : ""}</span></div>`).join("")}
+        </div>
+      </details>`).join("")}
+    ${given ? '<button type="button" class="btn purple" id="copy-rank">📋 Copiar ranking</button>' : ""}`;
+
+  const cb = $("copy-rank");
+  if (cb) cb.onclick = async () => {
+    try { await navigator.clipboard.writeText(window.RANKING_TEXT); toast("📋 Ranking copiado"); }
+    catch (e) { prompt("Copia el ranking:", window.RANKING_TEXT); }
+  };
 }
 
-$("go").onclick = () =>
-  render($("msgs").value.split(/PREDICCI[ÓO]N DEL BEB[ÉE]/i).slice(1).map(parse));
+// ---- Fuentes de datos ----
+$("go").onclick = () => {
+  LIST = $("msgs").value.split(/PREDICCI[ÓO]N DEL BEB[ÉE]/i).slice(1).map(parse);
+  render();
+};
 
 // Carga desde la hoja de Google. La clave se pide una vez y queda guardada solo en este navegador.
 $("load").onclick = async () => {
   if (!SHEET_URL) { alert("Falta configurar SHEET_URL en admin.html"); return; }
   let clave = localStorage.getItem("bingo_clave") || prompt("Clave de la hoja:");
   if (!clave) return;
-  $("out").innerHTML = '<p class="note">Cargando…</p>';
+  $("out").innerHTML = '<div class="box"><p class="hint" style="margin:0">Cargando…</p></div>';
   try {
     const data = await (await fetch(SHEET_URL + "?clave=" + encodeURIComponent(clave))).json();
-    if (data.error) { localStorage.removeItem("bingo_clave"); $("out").innerHTML = '<p class="note">Clave incorrecta.</p>'; return; }
+    if (data.error) { localStorage.removeItem("bingo_clave"); $("out").innerHTML = '<div class="box"><p class="hint" style="margin:0">Clave incorrecta. Vuelve a intentarlo.</p></div>'; return; }
     localStorage.setItem("bingo_clave", clave);
     // si alguien envió varias veces, cuenta solo la última de cada nombre
-    const last = new Map(data.map(r => [norm(r.name), r]));
-    render([...last.values()]);
-  } catch (e) { $("out").innerHTML = '<p class="note">No pude leer la hoja. Revisa SHEET_URL.</p>'; }
+    LIST = [...new Map(data.map(r => [norm(r.name), r])).values()];
+    render();
+  } catch (e) { $("out").innerHTML = '<div class="box"><p class="hint" style="margin:0">No pude leer la hoja. Revisa tu conexión.</p></div>'; }
 };
 </script>
 </body>

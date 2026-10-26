@@ -241,6 +241,7 @@ const CONFIG = {
   fechaLimite: "",              // "AAAA-MM-DD": último día para participar; "" = sin límite
   foto: "",                     // ej. "foto.jpg" (súbela al repo junto a index.html); "" = sin foto
   preguntarSexo: true,          // false si ya se sabe y no quieres la pregunta
+  hoja: "",                     // URL del Apps Script (termina en /exec); "" = solo WhatsApp
 };
 // ========================================================
 
@@ -320,8 +321,21 @@ function validate() {
   return d;
 }
 
+// Guarda la predicción en la hoja de Google (sin esperar respuesta: no bloquea WhatsApp)
+function enviarHoja(d) {
+  if (!CONFIG.hoja) return;
+  const respuestas = [d.resemble, formatDate(d.birthdate), d.weight, d.eyes, d.length, d.time,
+                      d.hair, d.hands, d.cry, d.sex || "", d.babyname];
+  fetch(CONFIG.hoja, {
+    method: "POST", mode: "no-cors", keepalive: true,
+    headers: { "Content-Type": "text/plain" },
+    body: JSON.stringify({ invitado: d.player, respuestas, mensaje: d.message }),
+  }).catch(() => {});
+}
+
 $("btn-send").onclick = () => {
   const d = validate(); if (!d) return;
+  enviarHoja(d);
   window.open(`https://wa.me/${CONFIG.telefono}?text=${encodeURIComponent(buildText(d))}`, "_blank");
   $("thanks").classList.add("show");
   $("thanks").scrollIntoView({ behavior: "smooth", block: "center" });

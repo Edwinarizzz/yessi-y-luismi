@@ -32,8 +32,10 @@
   <div class="box row" id="real"></div>
   <p class="note">Tolerancias para dar punto: peso ±0.1 kg · longitud ±1 cm. Fecha y momento del día exactos. Nombre: coincide si contiene el mismo texto. Deja en blanco lo que no quieras puntuar.</p>
 
-  <h2>2. Pega aquí las predicciones recibidas por WhatsApp</h2>
+  <h2>2. Predicciones</h2>
   <div class="box">
+    <button id="load" style="margin-top:0">Cargar desde la hoja de Google</button>
+    <p class="note">O, como respaldo, pega abajo los mensajes de WhatsApp:</p>
     <textarea id="msgs" placeholder="Pega todos los mensajes juntos. Cada uno debe empezar con «PREDICCIÓN DEL BEBÉ»."></textarea>
     <button id="go">Calcular puntos</button>
   </div>
@@ -56,6 +58,7 @@ const Q = [
   { k: "Sexo", t: "sel", o: ["Niño", "Niña"] },
   { k: "Nombre del bebé", t: "txt" },
 ];
+const SHEET_URL = "";   // URL del Apps Script (termina en /exec)
 const $ = id => document.getElementById(id);
 
 $("real").innerHTML = Q.map((q, i) => {
@@ -90,16 +93,15 @@ function parse(block) {
   return { name: p ? p[1].trim() : "(sin nombre)", a: Q.map(q => get(q.k)) };
 }
 
-$("go").onclick = () => {
+function render(list) {
   const real = Q.map((q, i) => {
     let v = $("r" + i).value.trim();
     if (q.t === "date" && v) { const [y, m, d] = v.split("-"); v = `${d}/${m}/${y}`; }
     return v;
   });
-  const blocks = $("msgs").value.split(/PREDICCI[ÓO]N DEL BEB[ÉE]/i).slice(1);
-  if (!blocks.length) { $("out").innerHTML = '<p class="note">No encontré predicciones. Pega los mensajes completos.</p>'; return; }
+  if (!list.length) { $("out").innerHTML = '<p class="note">No encontré predicciones.</p>'; return; }
 
-  const rows = blocks.map(parse).map(p => {
+  const rows = list.map(p => {
     const res = Q.map((q, i) => hit(q, real[i], p.a[i]));
     return { ...p, res, pts: res.filter(Boolean).length };
   }).sort((a, b) => b.pts - a.pts);
@@ -113,6 +115,25 @@ $("go").onclick = () => {
       ${r.res.map(ok => `<td class="${ok ? "ok" : "no"}">${ok ? "✔" : "·"}</td>`).join("")}</tr>`).join("")}
   </table></div>
   <p class="note">${top > 0 ? "🏆 Gana: " + rows.filter(r => r.pts === top).map(r => r.name).join(", ") + " con " + top + " punto(s)." : "Nadie acertó todavía."}</p>`;
+}
+
+$("go").onclick = () =>
+  render($("msgs").value.split(/PREDICCI[ÓO]N DEL BEB[ÉE]/i).slice(1).map(parse));
+
+// Carga desde la hoja de Google. La clave se pide una vez y queda guardada solo en este navegador.
+$("load").onclick = async () => {
+  if (!SHEET_URL) { alert("Falta configurar SHEET_URL en admin.html"); return; }
+  let clave = localStorage.getItem("bingo_clave") || prompt("Clave de la hoja:");
+  if (!clave) return;
+  $("out").innerHTML = '<p class="note">Cargando…</p>';
+  try {
+    const data = await (await fetch(SHEET_URL + "?clave=" + encodeURIComponent(clave))).json();
+    if (data.error) { localStorage.removeItem("bingo_clave"); $("out").innerHTML = '<p class="note">Clave incorrecta.</p>'; return; }
+    localStorage.setItem("bingo_clave", clave);
+    // si alguien envió varias veces, cuenta solo la última de cada nombre
+    const last = new Map(data.map(r => [norm(r.name), r]));
+    render([...last.values()]);
+  } catch (e) { $("out").innerHTML = '<p class="note">No pude leer la hoja. Revisa SHEET_URL.</p>'; }
 };
 </script>
 </body>

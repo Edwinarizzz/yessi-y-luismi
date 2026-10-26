@@ -81,6 +81,7 @@
   .detail .ok .mk { color: var(--green); } .detail .no .mk { color: #6b7280; }
   .detail .q { color: #a78bfa; min-width: 92px; font-size: 12px; }
   .detail .a { flex: 1; word-break: break-word; }
+  .detail .half .mk { color: var(--yellow); }
   .detail .no .a { color: #9ca3af; }
   .detail .real { display: block; font-size: 11px; color: var(--green); }
 
@@ -105,7 +106,7 @@
   <section class="box">
     <h2 class="step px">1 · RESULTADOS REALES</h2>
     <div class="fields" id="real"></div>
-    <p class="hint">Se guardan en este teléfono. Deja vacío lo que quieras ignorar. Peso, longitud y fecha: el punto es para quien más se acerque (si hay empate, todos lo reciben). El resto, respuesta exacta.</p>
+    <p class="hint">Se guardan en este teléfono. Deja vacío lo que quieras ignorar. Exacto = 1 punto. En fecha (±1 día), peso (±0.1 kg) y longitud (±1 cm), quedar cerca = 0.5 punto. El resto, respuesta exacta.</p>
     <button type="button" class="link" id="clear-real">Borrar resultados</button>
   </section>
 
@@ -125,9 +126,10 @@
 
 <script>
 // k = etiqueta tal como aparece en el mensaje de WhatsApp; t = cómo se compara
+// tol = margen para dar medio punto (días en la fecha, kg en el peso, cm en la longitud)
 const Q = [
   { k: "Parecido", t: "sel", o: ["Mamá", "Papá", "Mitad y mitad"] },
-  { k: "Fecha", t: "date" },
+  { k: "Fecha", t: "date", tol: 1 },
   { k: "Peso", t: "num", tol: 0.1, ph: "kg, ej. 3.2" },
   { k: "Ojos", t: "sel", o: ["Marrones / oscuros", "Azules", "Verdes", "Miel / cambiantes"] },
   { k: "Longitud", t: "num", tol: 1, ph: "cm, ej. 50" },
@@ -219,26 +221,19 @@ function render() {
   const real = realValues();
   const given = real.filter(Boolean).length;
 
-  // Peso, longitud y fecha: el punto es para quien más se acerque (empates: todos lo reciben)
-  const closest = Q.map((q, i) => {
-    if ((q.t !== "num" && q.t !== "date") || !real[i]) return null;
-    const r = dist(q, real[i]);
-    if (isNaN(r)) return null;
-    const ds = LIST.map(p => gap(q, p.a[i], r)).filter(d => !isNaN(d));
-    return ds.length ? { r, min: Math.min(...ds) } : null;
-  });
+  // Puntos por pregunta: 1 = exacto, 0.5 = cerca (peso, longitud, fecha), 0 = falló
+  const score = (q, i, guess) => {
+    if (q.t !== "num" && q.t !== "date") return hit(q, real[i], guess) ? 1 : 0;
+    if (!real[i] || !guess) return 0;
+    const d = gap(q, guess, dist(q, real[i]));
+    if (isNaN(d)) return 0;
+    if (d === 0) return 1;
+    return d <= q.tol + 1e-9 ? 0.5 : 0;
+  };
 
   const rows = LIST.map(p => {
-    const res = Q.map((q, i) => {
-      if (q.t === "num" || q.t === "date") {
-        const c = closest[i];
-        if (!c) return false;
-        const d = gap(q, p.a[i], c.r);
-        return !isNaN(d) && d === c.min;
-      }
-      return hit(q, real[i], p.a[i]);
-    });
-    return { ...p, res, pts: res.filter(Boolean).length };
+    const res = Q.map((q, i) => score(q, i, p.a[i]));
+    return { ...p, res, pts: res.reduce((a, b) => a + b, 0) };
   }).sort((a, b) => b.pts - a.pts);
 
   const top = rows[0].pts;
@@ -265,9 +260,9 @@ function render() {
           <span class="pts">${r.pts}<small> pts</small></span>
         </summary>
         <div class="detail">
-          ${Q.map((q, j) => `<div class="${r.res[j] ? "ok" : "no"}">
-            <span class="mk">${r.res[j] ? "✔" : "·"}</span><span class="q">${q.k}</span>
-            <span class="a">${esc(r.a[j] || "—")}${real[j] && !r.res[j] ? `<span class="real">Real: ${esc(real[j])}</span>` : ""}</span></div>`).join("")}
+          ${Q.map((q, j) => `<div class="${r.res[j] === 1 ? "ok" : r.res[j] ? "half" : "no"}">
+            <span class="mk">${r.res[j] === 1 ? "✔" : r.res[j] ? "½" : "·"}</span><span class="q">${q.k}</span>
+            <span class="a">${esc(r.a[j] || "—")}${real[j] && r.res[j] !== 1 ? `<span class="real">Real: ${esc(real[j])}</span>` : ""}</span></div>`).join("")}
         </div>
       </details>`).join("")}
     ${given ? '<button type="button" class="btn purple" id="copy-rank">📋 Copiar ranking</button>' : ""}`;
